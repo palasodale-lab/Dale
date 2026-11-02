@@ -87,7 +87,7 @@ scene.add(house.group);
 house.group.position.x = -0.6;
 
 // "skin" = everything that hides the steel frame (cladding, roof sheets, windows, trims, gutters)
-const keep = new Set([house.materials.pile, house.materials.steel, house.materials.timberDark]);
+const keep = new Set(['pile', 'steel', 'timberDark', 'black', 'slab', 'lamp'].map((k) => house.materials[k]));
 const skin = [];
 for (const g of [house.exterior, house.roof, house.interior])
   g.traverse((o) => {
@@ -170,7 +170,7 @@ hide('.a-price', 9.4);
 tl.to(S, { theta: 0.15, phi: 1.12, r: 23, ty: 1.2, duration: 2.6 }, 9.4);
 tl.to(S, { roofLift: 4.5, roofOp: 0, duration: 1.6, ease: 'power3.inOut' }, 9.7);
 tl.to(S, { glowI: 4, duration: 1 }, 9.6);
-tl.to(S, { sx: 0, sy: -0.14, duration: 1.6 }, 9.4);
+tl.to(S, { sx: 0, sy: -0.09, duration: 1.6 }, 9.4);
 show('.a-supply', 10.1, 0.2);
 rise('.a-supply', 10.1);
 chroma('.a-supply .a-h', 10.2);
@@ -181,7 +181,7 @@ tl.to(S, { roofLift: 0, roofOp: 1, duration: 1.3, ease: 'power3.inOut' }, 12.0);
 // 12.6 – 16  Coming soon end card
 tl.to(S, { theta: 0.85, phi: 0.2, r: 23, ty: 3.6, duration: 3.6, ease: 'power2.inOut' }, 12.2);
 tl.to(S, { glowI: 5, duration: 1 }, 12.4);
-tl.to(S, { sy: -0.2, duration: 2.4 }, 12.2);
+tl.to(S, { sy: -0.11, duration: 2.4 }, 12.2);
 tl.to('.a-ghost', { opacity: 0.18, duration: 1 }, 12.6);
 show('.a-end', 12.8, 0.2);
 rise('.a-end', 12.9, 1.2);

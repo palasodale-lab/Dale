@@ -67,7 +67,7 @@ body { font-family: var(--font); color: var(--fg); -webkit-font-smoothing: antia
 .is-vertical .a-disc { bottom: 5.5cqh; }
 .is-vertical .a-corner { right: 0; left: 0; text-align: center; bottom: 2.5cqh; }
 .a-logo svg { width: 7cqmax; height: 7cqmax; }
-.a-disc { position: absolute; left: 0; right: 0; bottom: 3.5cqh; text-align: center; font-size: max(9px, 0.85cqmax); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #e0453a; opacity: 0; }
+.a-disc { position: absolute; left: 0; right: 0; bottom: 8cqh; text-align: center; font-size: max(9px, 0.85cqmax); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #e0453a; opacity: 0; }
 
 .a-controls { position: fixed; bottom: 14px; left: 50%; translate: -50% 0; z-index: 10; display: flex; gap: 8px; font: 600 12px var(--font); }
 .a-controls button, .a-controls a { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 7px 14px; border-radius: 99px; cursor: pointer; text-decoration: none; }

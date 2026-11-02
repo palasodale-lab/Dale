@@ -10,12 +10,12 @@ export const dpcLogo = (size = 64) => `
 <svg class="dpc-logo" width="${size}" height="${size}" viewBox="0 0 120 120" role="img" aria-label="${esc(site.companyShort)} – ${esc(site.company)} (logo placeholder)">
   <defs>
     <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1d58a"/><stop offset=".5" stop-color="#c79a3c"/><stop offset="1" stop-color="#8a6420"/></linearGradient>
-    <path id="ring" d="M60 60 m-45 0 a45 45 0 1 1 90 0 a45 45 0 1 1 -90 0"/>
+    <path id="ring" d="M60 60 m-47 0 a47 47 0 1 1 94 0 a47 47 0 1 1 -94 0"/>
   </defs>
-  <circle cx="60" cy="60" r="57" fill="none" stroke="url(#gold)" stroke-width="3"/>
-  <circle cx="60" cy="60" r="35" fill="url(#gold)"/>
-  <text x="60" y="68" text-anchor="middle" font-size="22" font-weight="800" fill="#141110" font-family="Inter Tight, sans-serif">DPC</text>
-  <text font-size="8.6" font-weight="600" letter-spacing="1.2" fill="url(#gold)" font-family="Inter Tight, sans-serif"><textPath href="#ring" startOffset="0">DOKONA PAPUA CONSTRUCTION LIMITED ·</textPath></text>
+  <circle cx="60" cy="60" r="58" fill="#0c0c0c" stroke="url(#gold)" stroke-width="2.5"/>
+  <circle cx="60" cy="60" r="37" fill="none" stroke="url(#gold)" stroke-width="1.5"/>
+  <text x="60" y="71" text-anchor="middle" font-size="30" font-weight="800" fill="url(#gold)" font-family="Inter Tight, sans-serif" letter-spacing="-1">DPC</text>
+  <text font-size="8.4" font-weight="700" letter-spacing="1.1" fill="url(#gold)" font-family="Inter Tight, sans-serif"><textPath href="#ring" startOffset="0">DOKONA PAPUA CONSTRUCTION LIMITED ·</textPath></text>
 </svg>`;
 
 export function renderPage(root) {
@@ -192,7 +192,7 @@ export function renderPage(root) {
             .map(
               (v, i) => `<figure class="view-layer${i === 0 ? ' is-active' : ''}" data-i="${i}">
                 <img class="view-render" src="${v.image}" alt="${esc(v.label)} view" />
-                <img class="view-blue${v.mirrorBlueprint ? ' is-mirror' : ''}" src="${v.blueprint}" alt="${esc(v.blueprintLabel)}" />
+                <img class="view-blue" src="${v.blueprint}" alt="${esc(v.blueprintLabel)}" />
                 <figcaption><span class="cap-render">${esc(v.label)} · Render</span><span class="cap-blue">${esc(v.blueprintLabel)}</span></figcaption>
               </figure>`
             )

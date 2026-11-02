@@ -92,7 +92,7 @@ const st = (o) => ({ ...base, ...o });
 const heroEnd = st({ y: 0, s: 1, ry: 5, ghost: 0.35 });
 const builtEnd = st({ x: 19, y: 2, s: 1.12, ry: 11, rx: 3 });
 const builtGone = { ...builtEnd, op: 0, s: 1.35, ry: 16 };
-const statsIn = st({ x: 21, y: 4, s: 0.9, ry: -8, rx: 1, wRear: 0, wFront: 1 });
+const statsIn = st({ x: 23, y: 6, s: 0.72, ry: -8, rx: 1, wRear: 0, wFront: 1 });
 const KEYS = {
   overview: [K(0, st({ y: 4, s: 0.92, ry: -7, rx: 5, ghost: 1 })), K(1, heroEnd)],
   built: [K(0, heroEnd), K(0.55, builtEnd), K(1, builtEnd)],

@@ -49,9 +49,9 @@ export const site = {
 
 export const images = {
   rearIso: A('render-rear-iso.jpg'),
-  // ASSUMPTION: no front render was listed in the brief. A placeholder render-front.jpg is supplied —
-  // if DPC has no front render, point this at A('render-left.jpg').
-  front: A('render-front.jpg'),
+  // Section 3 crossfades to the right elevation (shows steps, louvres, raised floor, gutter + downpipe).
+  front: A('render-right.jpg'),
+  planDrawing: A('plan-drawing.png'),
   // Real photo supplied by DPC — the light-gauge steel frame (truss chord + V webs, screw-fixed)
   steelFrame: A('steel-frame.jpg'),
   floorplan: A('floorplan-3d.jpg'),
@@ -77,7 +77,7 @@ export const sections = {
     accent: ACCENTS.orange,
     headline: ['Built for the places', 'that break things.'],
     body: [
-      'Rural-ready from the ground up — a steel frame raised on piles above flood, damp and termites, under a corrugated roof that sheds tropical rain.',
+      'Rural-ready from the ground up — a steel frame raised on piles above flood, damp and termites, under a corrugated skillion roof that sheds tropical rain.',
       'Louvre windows on every side pull the breeze straight through, so the house stays cool without power.',
     ],
   },
@@ -103,12 +103,12 @@ export const sections = {
     count: 2,
     countLabel: 'Bedrooms.',
     headline: ['Two beds. One hall.', 'Zero wasted space.'],
-    // TODO(calibrate): hotspot positions on the FRONT render ([x%, y%] of the image)
+    // hotspot positions on render-right.jpg ([x%, y%] of the image)
     hotspots: [
-      { label: 'Steel frame on raised piles', at: [19.5, 66], side: 'left' },
-      { label: 'Louvre windows', at: [25, 44.8], side: 'left' },
-      { label: 'Front steps', at: [41.8, 77.5], side: 'right' },
-      { label: 'Gutter + downpipe', at: [79, 40], side: 'right' },
+      { label: 'Raised floor on piles', at: [42, 90], side: 'left' },
+      { label: 'Louvre windows', at: [49, 53], side: 'left' },
+      { label: 'Verandah steps', at: [8, 86], side: 'right' },
+      { label: 'Gutter + downpipe', at: [93.5, 55], side: 'left' },
     ],
   },
 
@@ -118,19 +118,19 @@ export const sections = {
     headline: ['Every room,', 'at a glance.'],
     cardTitle: 'Moto House · 2BR',
     areaUnit: 'm²',
-    // rect = [x%, y%, w%, h%] on floorplan-3d image — TODO(calibrate) for the real plan.
-    // area = TODO placeholder values (m²) — replace with DPC schedule.
+    // rect = [x%, y%, w%, h%] on floorplan-3d.jpg.
+    // area = approx. m², measured off the DPC floor plan (7000 × 6000 + 1728 verandah) — TBC by DPC.
     rooms: [
-      { name: 'Bedroom 1', area: 9.0, rect: [23.13, 16.62, 18.75, 27.82], caption: 'Corner bedroom with cross-flow louvres on two walls.' },
-      { name: 'Bedroom 2', area: 9.0, rect: [23.13, 44.44, 18.75, 27.81], caption: 'Second bedroom opening to the front for morning light.' },
-      { name: 'Hallway', area: 6.0, rect: [41.88, 16.62, 6.25, 55.63], caption: 'One straight hall links sleeping and living — nothing wasted.' },
-      { name: 'Bathroom', area: 3.6, rect: [48.13, 16.62, 12.49, 16.69], caption: 'Compact wet area grouped with the laundry for short plumbing runs.' },
-      { name: 'Kitchen', area: 7.2, rect: [48.13, 33.31, 25, 16.69], caption: 'Bench along the side wall with a louvre window above.' },
-      { name: 'Living / Diner', area: 9.6, rect: [48.13, 50, 25, 22.25], caption: 'Open living and dining that spills onto the front deck.' },
-      { name: 'Laundry', area: 3.6, rect: [60.62, 16.62, 12.51, 16.69], caption: 'Rear laundry with its own back door to the tank and yard.' },
-      { name: 'Front deck', area: 7.5, rect: [41.88, 72.25, 31.25, 13.91], caption: 'Covered-entry deck with rails and front steps down to the yard.' },
+      { name: 'Bedroom 1', area: 9.8, rect: [12.5, 39.6, 34.3, 29.8], caption: 'Front bedroom, 3.32 × 2.96 m, louvres on two walls for cross-breeze.' },
+      { name: 'Bedroom 2', area: 9.8, rect: [12.5, 9.7, 34.3, 29.3], caption: 'Rear bedroom of the same size — quiet, away from the verandah.' },
+      { name: 'Hallway', area: 6.0, rect: [47.4, 6.9, 10.8, 63.6], caption: 'One straight 1 m hall from the back door to the verandah — nothing wasted.' },
+      { name: 'Bathroom', area: 4.5, rect: [58.6, 9.7, 27.9, 19.5], caption: 'Shower, WC and vanity, grouped with the laundry for short plumbing runs.' },
+      { name: 'Kitchen', area: 4.3, rect: [58.6, 29.8, 27.9, 19.5], caption: 'Fridge, stove and sink along the wall, louvre window over the sink.' },
+      { name: 'Living / Diner', area: 4.8, rect: [58.6, 49.3, 27.9, 20.6], caption: 'Living and dining that opens straight onto the verandah.' },
+      { name: 'Laundry', area: 2.0, rect: [62.1, 3.5, 22.1, 6.2], caption: 'Covered rear laundry with tub and washer, beside the back steps.' },
+      { name: 'Verandah', area: 12.1, rect: [10.6, 70.5, 77.5, 17.8], caption: 'Full-width 1.73 m verandah under its own roof, with black railings and steps.' },
     ],
-    areaNote: 'Areas are placeholders (TODO) — subject to final design.',
+    areaNote: 'Approx. areas from the DPC concept drawings — subject to final design.',
   },
 
   water: {
@@ -141,9 +141,9 @@ export const sections = {
     countLabel: 'Litres.',
     headline: ['Rain in. Water stored.', 'Always on.'],
     body: 'Gutters along both eaves feed a downpipe straight into the rainwater tank on the stand — fresh water on site, no mains needed.',
-    // TODO(calibrate): tank box [x,y,w,h] % and gutter/downpipe polyline on render-right
-    tank: [58.47, 52.56, 20.15, 28.86],
-    pipePath: [[66.12, 39.33], [76.3, 34.9], [76.1, 45.13], [69.3, 45.08], [69.28, 51.5]],
+    // tank box [x,y,w,h] % and gutter/downpipe polyline on render-right.jpg
+    tank: [64, 40.5, 21, 50.5],
+    pipePath: [[32, 16.5], [90, 37.5], [93.6, 42.5], [93.6, 76]],
   },
 
   views: {
@@ -151,12 +151,12 @@ export const sections = {
     accent: ACCENTS.white,
     headline: ['One house.', 'Every angle.'],
     toggle: { render: 'Render', blueprint: 'Blueprint' },
-    // ASSUMPTION: Elevation C = rear, Elevation D = right side. TODO: confirm with DPC drawing set.
+    // Blueprints are crops of the DPC drawing set (elevations at 1:75 @ A3, floor plan).
     items: [
-      { key: 'rear', label: 'Rear', image: images.rear, blueprint: images.elev1, blueprintLabel: 'Elevation C · 1:75 @ A3', accent: ACCENTS.burgundy },
-      { key: 'right', label: 'Right', image: images.right, blueprint: images.elev2, blueprintLabel: 'Elevation D · 1:75 @ A3', accent: ACCENTS.blue },
-      { key: 'left', label: 'Left', image: images.left, blueprint: images.elev2, blueprintLabel: 'Elevation D (mirrored) · 1:75 @ A3', mirrorBlueprint: true, accent: ACCENTS.green },
-      { key: 'plan', label: 'Plan', image: images.floorplan, blueprint: images.floorplan, blueprintLabel: 'Floor plan · NTS', accent: ACCENTS.timber },
+      { key: 'rear', label: 'Rear', image: images.rear, blueprint: images.elev1, blueprintLabel: 'Elevations · incl. Elevation C · 1:75 @ A3', accent: ACCENTS.burgundy },
+      { key: 'right', label: 'Right', image: images.right, blueprint: images.elev2, blueprintLabel: 'Side elevations · incl. Elevation D · 1:75 @ A3', accent: ACCENTS.blue },
+      { key: 'left', label: 'Left', image: images.left, blueprint: images.elev2, blueprintLabel: 'Side elevations · incl. Elevation D · 1:75 @ A3', accent: ACCENTS.green },
+      { key: 'plan', label: 'Plan', image: images.floorplan, blueprint: images.planDrawing, blueprintLabel: 'Floor plan · 7000 × 7800', accent: ACCENTS.timber },
     ],
   },
 
@@ -188,12 +188,12 @@ export const sections = {
     rows: [
       { label: 'Bedrooms', cells: [1, 2, 3] },
       { label: 'Bathrooms', cells: [1, 1, 'TBC'] },
-      { label: 'Floor area', cells: ['TBC', { value: 48, suffix: ' m²', tbc: true }, 'TBC'] },
+      { label: 'Floor area', cells: ['TBC', { value: 42, suffix: ' m² + 12 m² verandah', tbc: true }, 'TBC'] },
       { label: 'Water storage', cells: ['TBC', { value: 2500, suffix: ' L', tbc: true }, 'TBC'] },
       { label: 'Frame', cells: ['Steel', 'Steel frame', 'Steel'] },
-      { label: 'Roof', cells: ['TBC', 'Corrugated iron, gable', 'TBC'] },
-      { label: 'Cladding', cells: ['TBC', 'Weatherboard, timber-look (TBC)', 'TBC'] },
-      { label: 'Foundation', cells: ['TBC', 'Raised on steel piles (TBC)', 'TBC'] },
+      { label: 'Roof', cells: ['TBC', 'Corrugated iron, skillion', 'TBC'] },
+      { label: 'Cladding', cells: ['TBC', 'White weatherboard', 'TBC'] },
+      { label: 'Foundation', cells: ['TBC', 'Raised on piles (TBC)', 'TBC'] },
     ],
   },
 
