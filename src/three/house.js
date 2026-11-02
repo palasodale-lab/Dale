@@ -2,7 +2,7 @@
  * Procedural low-poly model of the MOTO HOUSE – 2 Bedroom House (DPC).
  * Follows the DPC concept set: 7000 × 6000 plan + 1728 verandah, skillion roof rising toward
  * the verandah, white weatherboard, louvre windows, low black piles, centre hallway with rear
- * steps, rainwater tank on the right-hand side. Light-gauge galvanised steel frame inside.
+ * steps, rainwater tank beside the rear corner. Light-gauge galvanised steel frame inside.
  *
  * Units: metres. x = width (7 m, +x = right side / kitchen side), z = depth (+z = front / verandah), y = up.
  * Artistic approximation for the ad film only — NOT construction data.
@@ -14,7 +14,7 @@ export const DIM = {
   halfZ: 3,
   floorY: 0.7, // raised floor
   wallH: 2.4, // rear (low) wall height
-  rise: 1.0, // skillion rise from rear to front over 6 m
+  rise: 1.2, // skillion rise from rear to front over 6 m (~11°, as in the renders)
   verandah: 1.73,
 };
 
@@ -72,6 +72,24 @@ function weatherboardTex() {
     }
   });
 }
+/** Trapezoidal-rib roof sheet (like the burgundy Trimdek-style sheets in the DPC renders): 1 rib per tile. */
+function roofSheetTex(hex) {
+  return canvasTex(64, 8, (g, w, h) => {
+    const c = new THREE.Color(hex);
+    const hx = (k) => '#' + c.clone().multiplyScalar(k).getHexString();
+    g.fillStyle = hx(1.0);
+    g.fillRect(0, 0, w, h); // pan
+    g.fillStyle = hx(0.55);
+    g.fillRect(w * 0.70, 0, w * 0.06, h); // shadowed rib side
+    g.fillStyle = hx(1.35);
+    g.fillRect(w * 0.76, 0, w * 0.12, h); // rib crest highlight
+    g.fillStyle = hx(0.8);
+    g.fillRect(w * 0.88, 0, w * 0.05, h);
+    g.fillStyle = hx(0.92);
+    for (const x of [0.22, 0.46]) g.fillRect(w * x, 0, 1, h); // minor ribs
+  });
+}
+const RIB = 0.19; // metres between major ribs
 function ribTex(hex, ribs = 16, dark = 0.6, light = 1.25) {
   return canvasTex(256, 16, (g, w, h) => {
     const base = new THREE.Color(hex);
@@ -140,7 +158,7 @@ export function buildHouse() {
   const group = new THREE.Group();
 
   const cladBase = new THREE.MeshStandardMaterial({ map: weatherboardTex(), roughness: 0.7 });
-  const roofBase = new THREE.MeshStandardMaterial({ map: ribTex('#8e2433'), roughness: 0.5, metalness: 0.15, side: THREE.DoubleSide });
+  const roofBase = new THREE.MeshStandardMaterial({ map: roofSheetTex('#4f141c'), roughness: 0.6, metalness: 0.12, side: THREE.DoubleSide }); // deep maroon
   const M = {
     clad: cladBase,
     roof: roofBase,
@@ -247,8 +265,6 @@ export function buildHouse() {
   steps(-halfZ - 0.06, -1, 3, 1.0);
   // laundry nook at the rear right (under the roof overhang)
   exterior.add(box(2.3, 0.05, 0.85, M.timberDark, 2.05, floorY - 0.03, -halfZ - 0.43));
-  exterior.add(box(0.6, 0.85, 0.6, M.trim, 1.3, floorY + 0.43, -halfZ - 0.42));
-  exterior.add(box(0.9, 0.85, 0.55, M.trim, 2.5, floorY + 0.43, -halfZ - 0.4));
   // sides: kitchen window (right), two bedroom windows (left); front: bedroom 1 + living
   addWin(1.0, 1.0, halfX + out, wy + 0.05, -0.15, Math.PI / 2);
   addWin(1.2, 1.15, -halfX - out, wy, -1.5, -Math.PI / 2);
@@ -279,11 +295,11 @@ export function buildHouse() {
 
   /* ── roofs: main skillion (high at the verandah side) + lower verandah skillion ── */
   const lift = 0.06;
-  const oh = 0.45;
-  const z0 = -halfZ - oh, z1 = halfZ + 0.15;
+  const oh = 0.45; // rear + side overhang
+  const z0 = -halfZ - oh, z1 = halfZ + 0.6; // deep overhang at the high (verandah) edge
   const runLen = Math.hypot(z1 - z0, (z1 - z0) * slope);
   const roofW = halfX * 2 + oh * 2;
-  const main = box(roofW, 0.05, runLen, texFor(roofBase, roofW * 2, 1), 0, topAt((z0 + z1) / 2) + lift + 0.03, (z0 + z1) / 2);
+  const main = box(roofW, 0.05, runLen, texFor(roofBase, roofW / RIB, 1), 0, topAt((z0 + z1) / 2) + lift + 0.03, (z0 + z1) / 2);
   main.rotation.x = -Math.atan(slope);
   roof.add(main);
   roof.add(box(roofW, 0.2, 0.04, M.trim, 0, topAt(z1) + lift - 0.04, z1 + 0.02));
@@ -298,11 +314,11 @@ export function buildHouse() {
   gutter.rotation.z = Math.PI / 2;
   gutter.position.set(0, gY, z0 - 0.08);
   roof.add(gutter);
-  const vTop = frontTop - 0.25;
+  const vTop = frontTop - 0.35; // tucked under the main roof's high edge
   const vEnd = vz1 + 0.35;
   const vDrop = 0.45;
   const vLen = Math.hypot(vEnd - halfZ, vDrop);
-  const vr = box(roofW, 0.04, vLen, texFor(roofBase, roofW * 2, 1), 0, vTop - vDrop / 2, (halfZ + vEnd) / 2);
+  const vr = box(roofW, 0.04, vLen, texFor(roofBase, roofW / RIB, 1), 0, vTop - vDrop / 2, (halfZ + vEnd) / 2);
   vr.rotation.x = Math.atan2(vDrop, vEnd - halfZ);
   roof.add(vr);
   roof.add(box(roofW, 0.16, 0.04, M.trim, 0, vTop - vDrop - 0.05, vEnd + 0.02));
@@ -310,7 +326,7 @@ export function buildHouse() {
 
   /* ── rainwater tank (right side, toward the rear) ── */
   const tank = new THREE.Group();
-  const tankPos = V(halfX + 1.35, 0, -1.4);
+  const tankPos = V(-halfX - 1.35, 0, -1.4); // on the right when facing the rear wall (as in the rear renders)
   const tankR = 1.0, tankH = 1.9, slabH = 0.18;
   tank.add(box(2.4, slabH, 2.4, M.slab, 0, slabH / 2, 0));
   const cyl = new THREE.Mesh(new THREE.CylinderGeometry(tankR, tankR, tankH, 48), M.tank);
@@ -329,12 +345,12 @@ export function buildHouse() {
   });
   lbl.wrapS = lbl.wrapT = THREE.ClampToEdgeWrapping;
   const label = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.38), new THREE.MeshBasicMaterial({ map: lbl, transparent: true }));
-  label.position.set(tankR + 0.01, slabH + tankH * 0.62, 0);
-  label.rotation.y = Math.PI / 2;
+  label.position.set(-tankR - 0.01, slabH + tankH * 0.62, 0);
+  label.rotation.y = -Math.PI / 2;
   tank.add(label);
   tank.position.copy(tankPos);
   group.add(tank);
-  const dpx = halfX + oh - 0.1;
+  const dpx = -(halfX + oh - 0.1);
   const tankTop = slabH + tankH + 0.2;
   const pts = [V(dpx, gY, z0 - 0.08), V(dpx, tankTop + 0.3, z0 - 0.08), V(tankPos.x, tankTop + 0.3, tankPos.z - 0.3), V(tankPos.x, tankTop, tankPos.z - 0.3)];
   const path = new THREE.CurvePath();

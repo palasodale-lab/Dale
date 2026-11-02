@@ -250,6 +250,8 @@ resize();
 
 if (capture) {
   window.__duration = DUR;
+  window.__S = S; // exposed for framing checks
+  window.__render = (t) => update(t);
   window.__seek = (t) => {
     tl.seek(t, false);
     update(t);

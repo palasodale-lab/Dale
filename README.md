@@ -27,12 +27,12 @@ npm run build        # static build in /dist (deploy anywhere)
 
 ## ⚠️ Assumptions & TODOs (please check)
 
-1. **3D model = approximation.** The film's house is a procedural model built from the DPC drawings and renders: 7000 × 6000 plan, 1728 verandah, skillion roof rising toward the verandah, white weatherboard, louvre windows, low black piles, centre hallway with rear steps, 2,500 L tank on the right. It is not construction data.
+1. **3D model = approximation.** The film's house is a procedural model built from the DPC drawings and renders: 7000 × 6000 plan, 1728 verandah, skillion roof rising toward the verandah, white weatherboard, louvre windows, low black piles, centre hallway with rear steps, 2,500 L tank on the right as you face the rear wall. It is not construction data.
 2. **Steel frame.** The model follows your photo: light-gauge galvanised members with screw-fixed V/W-web trusses. The copy says "light-gauge galvanised steel". Please confirm the spec.
 3. **Water tank.** The site shows **2,500 L** as the renders do. The elevation drawings say **9,000 LITERS**. Confirm the size (TODO in `content.js`).
 4. **Section 3 "front render".** The set has no front render, so section 3 crossfades to the **right elevation**. It shows the verandah steps, louvres, raised floor and gutter + downpipe for the hotspots.
 5. **Room areas** were measured off the CAD plan (bedrooms ≈ 9.8 m², hallway 6.0 m², verandah ≈ 12.1 m², floor area 42 m² + verandah). They are shown as approximate/TBC. The **1BR and 3BR** models are invented variants marked **TBC**.
-6. **Roof direction.** The renders show the skillion high at the verandah side, falling to the rear. One of the CAD side elevations shows it the other way round. The model follows the renders.
+6. **Roof.** Deep-maroon corrugated sheet. The skillion is high at the verandah side, falls to the rear, and has a deep front overhang above the lower verandah roof, as in the renders. One of the CAD side elevations shows it the other way round. The model follows the renders.
 7. **"Less than 100K"** is shown exactly as given, with no currency added (presumably PGK). "Supply only" is paired with the line "2 bedrooms · 1 bathroom · 1 home".
 8. **Contacts and the DPC logo** are placeholders: a black-and-gold SVG mark styled after the DPC badge, phone, email and the `mailto:` on "Request this design". Drop in the real logo file when you have it.
 9. The renders keep their tropical backgrounds and are feathered into the dark page with a soft mask. True cut-outs (transparent PNG/WebP) would float better. Swap them in under the same names.
