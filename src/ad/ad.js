@@ -255,17 +255,17 @@ show('.a-supply', P + 10.1, 0.2);
 rise('.a-supply', P + 10.1);
 chroma('.a-supply .a-h', P + 10.2);
 tl.from('.a-supply .a-sub', { opacity: 0, y: 12, duration: 0.6 }, P + 10.6);
-hide('.a-supply', P + 12.3);
-tl.to(S, { roofLift: 0, roofOp: 1, duration: 1.3, ease: 'power3.inOut' }, P + 12.0);
+hide('.a-supply', P + 11.9);
+tl.to(S, { roofLift: 0, roofOp: 1, duration: 1.1, ease: 'power3.inOut' }, P + 11.5);
 
 // coming soon
-tl.to(S, { theta: 0.85, phi: 0.2, r: 23, ty: 3.6, duration: 3.6, ease: 'power2.inOut' }, P + 12.2);
+tl.to(S, { theta: 0.85, phi: 0.2, r: 23, ty: 3.6, duration: 2.4, ease: 'power2.inOut' }, P + 11.6);
 tl.to(S, { glowI: 6, duration: 1 }, P + 12.4);
 tl.to(S, { sy: -0.11, duration: 2.4 }, P + 12.2);
 tl.to('.a-ghost', { opacity: 0.18, duration: 1 }, P + 12.6);
-show('.a-end', P + 12.8, 0.2);
-rise('.a-end', P + 12.9, 1.2);
-chroma('.a-end .a-h', P + 13.0);
+show('.a-end', P + 13.3, 0.2);
+rise('.a-end', P + 13.3, 1.1);
+chroma('.a-end .a-h', P + 13.4);
 tl.from('.a-end .a-chips li', { opacity: 0, y: 16, stagger: 0.1, duration: 0.6, ease: 'power3.out' }, P + 13.5);
 show('.a-disc', P + 14.0, 0.6);
 
