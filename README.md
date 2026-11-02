@@ -15,7 +15,7 @@ npm run build        # static build in /dist (deploy anywhere)
 |---|---|
 | **Website** (`index.html`) | Nine pinned, scroll-scrubbed sections: Hero → Built for… → **Steel frame (real DPC photo)** → Bedroom count → Floor plan → Water → Views (Render ⇄ Blueprint) → Move in → Pick your size, then the footer. Built with Vite, vanilla JS, GSAP + ScrollTrigger and Lenis. |
 | **3D ad film** (`ad.html`) | A 16-second real-time Three.js film of a procedural model of the steel-framed house. It shows the copy **"Less than 100K"**, **"Supply only"** and **"Coming soon"**, plus a scene where the cladding fades away to show the **steel frame**, then cuts to the real DPC frame photo. Use `?format=vertical` for the 9:16 social cut. |
-| **Rendered videos** | `public/media/moto-house-ad.mp4` (1920×1080) and `public/media/moto-house-ad-vertical.mp4` (1080×1920), each with a poster JPG. The site plays the 16:9 film from the **▶ Watch the film** button in the closing section. |
+| **Rendered videos** | `public/media/moto-house-ad.mp4` (1920×1080, 16 s) and `public/media/moto-house-ad-vertical.mp4` (1080×1920, for Facebook/TikTok/Reels), each with a poster JPG. The site plays the 16:9 film from the **▶ Watch the film** button in the closing section. |
 
 ## Editing
 
