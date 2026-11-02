@@ -52,6 +52,8 @@ export const images = {
   // ASSUMPTION: no front render was listed in the brief. A placeholder render-front.jpg is supplied —
   // if DPC has no front render, point this at A('render-left.jpg').
   front: A('render-front.jpg'),
+  // Real photo supplied by DPC — the light-gauge steel frame (truss chord + V webs, screw-fixed)
+  steelFrame: A('steel-frame.jpg'),
   floorplan: A('floorplan-3d.jpg'),
   elev1: A('elev-drawing-1.png'),
   elev2: A('elev-drawing-2.png'),
@@ -77,6 +79,21 @@ export const sections = {
     body: [
       'Rural-ready from the ground up — a steel frame raised on piles above flood, damp and termites, under a corrugated roof that sheds tropical rain.',
       'Louvre windows on every side pull the breeze straight through, so the house stays cool without power.',
+    ],
+  },
+
+  frame: {
+    id: 'frame',
+    accent: '#9aa4aa',
+    eyebrow: 'Structure',
+    headline: ['Steel bones.', 'Built to last.'],
+    body: 'A light-gauge galvanised steel frame, screw-fixed truss by truss. It will not rot, warp or feed termites — and every member is stamped DPC.',
+    caption: 'Actual DPC steel frame',
+    // [x%, y%] on steel-frame.jpg
+    callouts: [
+      { label: 'Galvanised steel members', at: [72, 47] },
+      { label: 'DPC-stamped', at: [50.5, 58] },
+      { label: 'Screw-fixed truss joints', at: [62, 73] },
     ],
   },
 

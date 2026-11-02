@@ -19,7 +19,7 @@ export const dpcLogo = (size = 64) => `
 </svg>`;
 
 export function renderPage(root) {
-  const { hero, built, stats, floorplan, water, views, closing, compare, footer } = S;
+  const { hero, built, frame, stats, floorplan, water, views, closing, compare, footer } = S;
 
   root.innerHTML = `
 <a class="skip" href="#main">Skip to content</a>
@@ -82,6 +82,25 @@ export function renderPage(root) {
         <h2 class="display reveal">${lines(built.headline)}</h2>
         <div class="body reveal-body">${built.body.map((b) => `<p>${esc(b)}</p>`).join('')}</div>
       </div>
+    </div>
+  </section>
+
+  <!-- 2b STEEL FRAME (real DPC photo) -->
+  <section class="sec sec-frame" id="${frame.id}" data-accent="${frame.accent}" style="--h:260vh">
+    <div class="sticky">
+      <div class="frame-photo">
+        <img src="${images.steelFrame}" alt="Close-up of the DPC light-gauge steel frame: a truss chord with V-shaped web members, screw-fixed, stamped DPC" />
+        ${frame.callouts
+          .map((c, i) => `<div class="callout" style="--x:${c.at[0]}%;--y:${c.at[1]}%;--i:${i}"><i class="callout-dot"></i><span class="callout-label">${esc(c.label)}</span></div>`)
+          .join('')}
+      </div>
+      <div class="frame-shade" aria-hidden="true"></div>
+      <div class="copy copy--left">
+        <p class="eyebrow reveal-body">${esc(frame.eyebrow)}</p>
+        <h2 class="display reveal">${lines(frame.headline)}</h2>
+        <p class="body reveal-body">${esc(frame.body)}</p>
+      </div>
+      <p class="frame-caption">${esc(frame.caption)}</p>
     </div>
   </section>
 

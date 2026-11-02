@@ -13,24 +13,24 @@ npm run build        # static build in /dist (deploy anywhere)
 
 | | |
 |---|---|
-| **Website** (`index.html`) | Eight pinned, scroll-scrubbed sections: Hero → Built for… → Bedroom count → Floor plan → Water → Views (Render ⇄ Blueprint) → Move in → Pick your size, then the footer. Built with Vite, vanilla JS, GSAP + ScrollTrigger and Lenis. |
-| **3D ad film** (`ad.html`) | A 16-second real-time Three.js film of a procedural model of the steel-framed house. It shows the copy **"Less than 100K"**, **"Supply only"** and **"Coming soon"**, plus a scene where the cladding fades away to show the **steel frame**. Use `?format=vertical` for the 9:16 social cut. |
+| **Website** (`index.html`) | Nine pinned, scroll-scrubbed sections: Hero → Built for… → **Steel frame (real DPC photo)** → Bedroom count → Floor plan → Water → Views (Render ⇄ Blueprint) → Move in → Pick your size, then the footer. Built with Vite, vanilla JS, GSAP + ScrollTrigger and Lenis. |
+| **3D ad film** (`ad.html`) | A 16-second real-time Three.js film of a procedural model of the steel-framed house. It shows the copy **"Less than 100K"**, **"Supply only"** and **"Coming soon"**, plus a scene where the cladding fades away to show the **steel frame**, then cuts to the real DPC frame photo. Use `?format=vertical` for the 9:16 social cut. |
 | **Rendered videos** | `public/media/moto-house-ad.mp4` (1920×1080) and `public/media/moto-house-ad-vertical.mp4` (1080×1920), each with a poster JPG. The site plays the 16:9 film from the **▶ Watch the film** button in the closing section. |
 
 ## Editing
 
 - **All copy and data are in [`src/content.js`](src/content.js)**: headlines (one array item per line), body text, nav, badges, room names and areas, comparison table, footer contacts and the ad-film copy. No copy is stored anywhere else.
 - **Images** go in `public/assets/` and keep these filenames:
-  `render-rear-iso.jpg`, `render-front.jpg`, `floorplan-3d.jpg`, `elev-drawing-1.png`, `elev-drawing-2.png`, `render-rear.jpg`, `render-right.jpg`, `render-left.jpg`.
+  `render-rear-iso.jpg`, `render-front.jpg`, `steel-frame.jpg`, `floorplan-3d.jpg`, `elev-drawing-1.png`, `elev-drawing-2.png`, `render-rear.jpg`, `render-right.jpg`, `render-left.jpg`.
 - **Re-render the film** after you change ad copy: `npm run render:ad` (16:9) and `npm run render:ad -- --vertical` (9:16). This needs Playwright Chromium (`npx playwright install chromium`) and `ffmpeg`. For a quick draft add `--fps 24 --scale 0.5`.
 - `npm run placeholders` rebuilds the placeholder images from the 3D model.
 
 ## ⚠️ Assumptions & TODOs (please check)
 
-1. **The images you attached did not reach the repo.** So the site runs today, every file in `public/assets/` is a **placeholder** made from a procedural 3D model of the house. Each one is stamped "PLACEHOLDER". To swap them, drop the real DPC renders in under the same filenames.
+1. **Only the steel-frame photo reached the repo** (`public/assets/steel-frame.jpg`, real). The six renders/drawings did not. So the site runs today, every file in `public/assets/` is a **placeholder** made from a procedural 3D model of the house. Each one is stamped "PLACEHOLDER". To swap them, drop the real DPC renders in under the same filenames.
 2. **Calibrate the overlays after swapping images.** Hotspot leader lines, floor-plan room outlines, the water-tank gauge box and the gutter/downpipe line are stored as % coordinates in `content.js`. Search for `TODO(calibrate)`. They currently match the placeholders. Image boxes assume a 16:10 frame.
 3. **Front render.** The brief asks for a crossfade to a "front render", but none was listed. A placeholder `render-front.jpg` is included. If DPC has none, point `images.front` at `render-left.jpg`.
-4. **Steel frame.** The house is described as steel-framed. The model, copy and table show a steel frame and steel piles. Pile material and cladding (shown as timber-look weatherboard) are marked **TBC**.
+4. **Steel frame.** The model follows your photo: light-gauge galvanised members with screw-fixed V/W-web trusses. The copy calls it "light-gauge galvanised steel" (please confirm the spec). The model also shows steel piles. Pile material and cladding (shown as timber-look weatherboard) are marked **TBC**.
 5. **Water tank.** The site shows **2,500 L** as the renders do. The elevation drawings say **9,000 L**. Confirm the size (TODO in `content.js`).
 6. **Elevations.** Elevation C is assumed to be the rear and Elevation D the right side. The "Left" blueprint is a mirrored Elevation D.
 7. **Room areas** (floor-plan card) and **floor area 48 m²** are placeholders marked TODO/TBC. The **1BR and 3BR** models are invented variants. Every invented value shows a **TBC** tag.

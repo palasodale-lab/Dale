@@ -72,7 +72,7 @@ $$('.sec').forEach((sec) => {
       if (!self.isActive) return;
       if (sec.id !== 'views') setAccent(sec.dataset.accent);
       else setAccent(S.views.items[viewIndex]?.accent);
-      const navId = { overview: 'overview', built: 'overview', stats: 'overview', floorplan: 'floorplan', water: 'water', views: 'views', closing: 'views', specs: 'specs' }[sec.id];
+      const navId = { overview: 'overview', built: 'overview', frame: 'overview', stats: 'overview', floorplan: 'floorplan', water: 'water', views: 'views', closing: 'views', specs: 'specs' }[sec.id];
       navLinks.forEach((l) => l.classList.toggle('is-active', l.dataset.nav === navId));
     },
   });
@@ -91,11 +91,13 @@ const base = { x: 0, y: 0, s: 1, ry: 0, rx: 2, op: 1, ghost: 0, wRear: 1, wFront
 const st = (o) => ({ ...base, ...o });
 const heroEnd = st({ y: 0, s: 1, ry: 5, ghost: 0.35 });
 const builtEnd = st({ x: 19, y: 2, s: 1.12, ry: 11, rx: 3 });
+const builtGone = { ...builtEnd, op: 0, s: 1.35, ry: 16 };
 const statsIn = st({ x: 21, y: 4, s: 0.9, ry: -8, rx: 1, wRear: 0, wFront: 1 });
 const KEYS = {
   overview: [K(0, st({ y: 4, s: 0.92, ry: -7, rx: 5, ghost: 1 })), K(1, heroEnd)],
   built: [K(0, heroEnd), K(0.55, builtEnd), K(1, builtEnd)],
-  stats: [K(0, builtEnd), K(0.22, statsIn), K(0.35, { ...statsIn, labels: 1, ry: -4 }), K(0.85, { ...statsIn, labels: 1, ry: 4 }), K(1, { ...statsIn, ry: 6, s: 0.96 })],
+  frame: [K(0, builtEnd), K(0.1, builtGone), K(1, builtGone)],
+  stats: [K(0, { ...statsIn, op: 0, s: 0.8 }), K(0.18, statsIn), K(0.35, { ...statsIn, labels: 1, ry: -4 }), K(0.85, { ...statsIn, labels: 1, ry: 4 }), K(1, { ...statsIn, ry: 6, s: 0.96 })],
   floorplan: [K(0, { ...statsIn, ry: 6, s: 0.96 }), K(0.1, { ...statsIn, op: 0, s: 0.7, y: -8, ry: 14 }), K(1, { ...statsIn, op: 0, s: 0.7 })],
   water: [K(0, st({ op: 0, wRear: 1 })), K(1, st({ op: 0 }))],
   views: [K(0, st({ op: 0 })), K(1, st({ op: 0, y: 12, s: 0.85 }))],
@@ -229,6 +231,31 @@ scrub($('.sec-hero'), (p) => {
 
 /* 2 — built */
 scrub($('.sec-built'), null, { enter: 0.2, exit: 0.85 });
+
+/* 2b — steel frame photo: slow push-in, callouts appear one by one */
+const framePhoto = $('.frame-photo');
+const callouts = $$('.callout');
+scrub(
+  $('.sec-frame'),
+  (p) => {
+    if (reduced) {
+      callouts.forEach((c) => (c.style.opacity = 1));
+      return;
+    }
+    const vin = remap(p, 0, 0.12);
+    const vout = remap(p, 0.9, 1);
+    framePhoto.style.opacity = Math.min(vin, 1 - vout);
+    framePhoto.style.transform = `scale(${1.25 - 0.2 * p})`;
+    framePhoto.style.filter = `blur(${(1 - vin) * 12}px) saturate(${0.6 + vin * 0.4})`;
+    callouts.forEach((c, i) => {
+      const a = Math.min(remap(p, 0.3 + i * 0.12, 0.38 + i * 0.12), 1 - vout);
+      c.style.opacity = a;
+      c.style.transform = `translateY(${(1 - a) * 10}px)`;
+    });
+    gsap.set('.frame-caption, .frame-shade', { opacity: Math.min(vin, 1 - vout) });
+  },
+  { enter: 0.16, exit: 0.88 }
+);
 
 /* 3 — stats count-up */
 const statOdo = new Odometer($('.sec-stats .stat-num'), { target: S.stats.count });

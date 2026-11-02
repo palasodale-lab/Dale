@@ -33,7 +33,7 @@ export const COLORS = {
   timber: '#c8924f',
   timberDark: '#6b4a32',
   pile: '#8d969c', // galvanised steel
-  steel: '#9aa4aa',
+  steel: '#c3cbcf', // bright zinc-coated light-gauge steel (see public/assets/steel-frame.jpg)
   trim: '#e9e4da',
   glass: '#18232b',
   louvre: '#a9bcc8',
@@ -104,6 +104,16 @@ function box(w, h, d, material, x = 0, y = 0, z = 0) {
   m.position.set(x, y, z);
   m.castShadow = true;
   m.receiveShadow = true;
+  return m;
+}
+
+/** A square-section member running between two points (for truss webs). */
+function member(a, b, t, material) {
+  const len = a.distanceTo(b);
+  const m = new THREE.Mesh(new THREE.BoxGeometry(t, t, len), material);
+  m.position.copy(a).add(b).multiplyScalar(0.5);
+  m.lookAt(b); // +z (the long axis) points at b
+  m.castShadow = m.receiveShadow = true;
   return m;
 }
 
@@ -381,11 +391,14 @@ export function buildHouse() {
     }
     truss.add(box(studT, studT, halfZ * 2, M.steel, 0, top, 0)); // bottom chord
     truss.add(box(studT, ridgeRise, studT, M.steel, 0, top + ridgeRise / 2, 0)); // king post
+    // Warren (V / W) webs zig-zagging between bottom chord and rafter — as on the DPC frame
+    const rafterY = (z) => top + ridgeRise * (1 - Math.abs(z) / halfZ) - 0.07;
     for (const sgn of [1, -1]) {
-      // web: from the bottom-chord centre up to the rafter mid-point (stays under the roof sheet)
-      const w = box(studT * 0.8, studT * 0.8, Math.hypot(halfZ / 2, ridgeRise / 2) - 0.1, M.steel, 0, top + ridgeRise / 4, (sgn * halfZ) / 4);
-      w.rotation.x = -sgn * Math.atan2(ridgeRise / 2, halfZ / 2);
-      truss.add(w);
+      for (let z = 0; z < halfZ - 0.01; z += 1) {
+        const peak = new THREE.Vector3(0, rafterY(z + 0.5), sgn * (z + 0.5));
+        truss.add(member(new THREE.Vector3(0, top + 0.03, sgn * z), peak, studT * 0.8, M.steel));
+        truss.add(member(peak, new THREE.Vector3(0, top + 0.03, sgn * (z + 1)), studT * 0.8, M.steel));
+      }
     }
     truss.position.x = x;
     frame.add(truss);

@@ -12,7 +12,7 @@ import './ad.css';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { buildHouse, addLights, addGround } from '../three/house.js';
-import { ad as C, ACCENTS } from '../content.js';
+import { ad as C, ACCENTS, images } from '../content.js';
 import { dpcLogo } from '../dom.js';
 
 const params = new URLSearchParams(location.search);
@@ -28,6 +28,7 @@ const m = (t, cls = '') => `<span class="mask ${cls}"><span>${t}</span></span>`;
 el.innerHTML = `
   <div class="a-layer a-back"><div class="a-ghost">MOTO</div></div>
   <div class="a-layer a-front">
+    <div class="a-photo"><img src="${images.steelFrame}" alt="" /><span class="a-photo-cap">Actual DPC steel frame</span></div>
     <div class="a-mark">DPC <b>–</b> Moto House</div>
     <div class="a-block a-center a-presents a-small">${C.presents}</div>
     <div class="a-block a-center a-title">
@@ -96,7 +97,7 @@ for (const g of [house.exterior, house.roof, house.interior])
     o.material.transparent = true;
     skin.push(o);
   });
-const frameGlow = new THREE.MeshStandardMaterial({ color: '#b9c6cf', metalness: 0.9, roughness: 0.25, emissive: '#2a3640', emissiveIntensity: 0.6 });
+const frameGlow = new THREE.MeshStandardMaterial({ color: '#d6dde1', metalness: 0.85, roughness: 0.3, emissive: '#2f3a42', emissiveIntensity: 0.6 });
 house.frame.traverse((o) => o.isMesh && (o.material = frameGlow));
 
 // atmosphere: drifting dust motes (deterministic from time)
@@ -146,8 +147,12 @@ tl.to(S, { glowI: 2, duration: 1 }, 3.4);
 show('.a-frame', 3.8, 0.2);
 rise('.a-frame', 3.8);
 tl.from('.a-frame .a-sub, .a-frame .a-features span', { opacity: 0, y: 14, stagger: 0.08, duration: 0.6, ease: 'power3.out' }, 4.3);
-tl.to(S, { skin: 1, duration: 0.8 }, 5.9);
-hide('.a-frame', 6.2);
+// cut to the real DPC frame photo, then back to 3D
+tl.fromTo('.a-photo', { opacity: 0 }, { opacity: 1, duration: 0.35, ease: 'power2.out' }, 4.75);
+tl.fromTo('.a-photo img', { scale: 1.18 }, { scale: 1.04, duration: 1.6, ease: 'none' }, 4.75);
+tl.to('.a-photo', { opacity: 0, duration: 0.35, ease: 'power2.in' }, 6.0);
+tl.to(S, { skin: 1, duration: 0.8 }, 6.0);
+hide('.a-frame', 6.25);
 tl.to('.a-ghost', { opacity: 0, duration: 0.6 }, 3.4);
 
 // 6.6 – 9.6  Price
