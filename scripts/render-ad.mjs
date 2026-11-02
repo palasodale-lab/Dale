@@ -36,30 +36,41 @@ await fs.mkdir(outDir, { recursive: true });
 const server = await createServer({ root, logLevel: 'error', server: { port: 5198 } });
 await server.listen();
 const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
-const page = await browser.newPage({ viewport: { width: W, height: H } });
-page.on('console', (m) => m.type() === 'error' && console.error('[page]', m.text()));
-page.on('pageerror', (e) => console.error('[page]', e.message));
-await page.goto(`http://localhost:${server.config.server.port}/ad.html?capture=1${vertical ? '&format=vertical' : ''}`);
-await page.waitForFunction(() => window.__ready === true, null, { timeout: 60000 });
+const url = `http://localhost:${server.config.server.port}/ad.html?capture=1${vertical ? '&format=vertical' : ''}`;
+let page;
+async function openPage() {
+  if (page) await page.close().catch(() => {});
+  page = await browser.newPage({ viewport: { width: W, height: H } });
+  page.on('console', (m) => m.type() === 'error' && console.error('[page]', m.text()));
+  page.on('pageerror', (e) => console.error('[page]', e.message));
+  await page.goto(url);
+  await page.waitForFunction(() => window.__ready === true, null, { timeout: 60000 });
+}
+await openPage();
 const dur = await page.evaluate(() => window.__duration);
 const total = Math.round(dur * fps);
 const t0 = Date.now();
-for (let f = 0; f < total; f++) {
-  await page.evaluate((t) => window.__seek(t), f / fps);
+// The film is deterministic (seek-based), so a stalled headless screenshot can simply be
+// retried on a fresh page without affecting the output.
+async function shot(t, file, quality = 92) {
   for (let attempt = 0; ; attempt++) {
     try {
-      await page.screenshot({ path: path.join(framesDir, `f${String(f).padStart(5, '0')}.jpg`), type: 'jpeg', quality: 92, timeout: 120000 });
-      break;
+      await page.evaluate((x) => window.__seek(x), t);
+      await page.screenshot({ path: file, type: 'jpeg', quality, timeout: 20000 });
+      return;
     } catch (e) {
-      if (attempt >= 2) throw e;
-      console.warn(`\nretrying frame ${f}…`);
+      if (attempt >= 4) throw e;
+      console.warn(`\nframe at ${t.toFixed(2)}s stalled — reopening page (attempt ${attempt + 1})`);
+      await openPage();
     }
   }
+}
+for (let f = 0; f < total; f++) {
+  await shot(f / fps, path.join(framesDir, `f${String(f).padStart(5, '0')}.jpg`));
   if (f % 30 === 0) process.stdout.write(`\rframe ${f}/${total}  ${((Date.now() - t0) / 1000).toFixed(0)}s`);
 }
 // poster = end card
-await page.evaluate((t) => window.__seek(t), dur - 1);
-await page.screenshot({ path: path.join(outDir, `${name}-poster.jpg`), type: 'jpeg', quality: 88 });
+await shot(dur - 1, path.join(outDir, `${name}-poster.jpg`), 88);
 await browser.close();
 await server.close();
 console.log('\nencoding…');
