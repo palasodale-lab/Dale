@@ -6,17 +6,8 @@ const lines = (arr, cls = '') =>
   `<span class="lines ${cls}">${arr.map((l) => `<span class="line"><span class="line-inner">${esc(l)}</span></span>`).join('')}</span>`;
 const badges = () => `<ul class="badges">${site.badges.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>`;
 
-export const dpcLogo = (size = 64) => `
-<svg class="dpc-logo" width="${size}" height="${size}" viewBox="0 0 120 120" role="img" aria-label="${esc(site.companyShort)} – ${esc(site.company)} (logo placeholder)">
-  <defs>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1d58a"/><stop offset=".5" stop-color="#c79a3c"/><stop offset="1" stop-color="#8a6420"/></linearGradient>
-    <path id="ring" d="M60 60 m-47 0 a47 47 0 1 1 94 0 a47 47 0 1 1 -94 0"/>
-  </defs>
-  <circle cx="60" cy="60" r="58" fill="#0c0c0c" stroke="url(#gold)" stroke-width="2.5"/>
-  <circle cx="60" cy="60" r="37" fill="none" stroke="url(#gold)" stroke-width="1.5"/>
-  <text x="60" y="71" text-anchor="middle" font-size="30" font-weight="800" fill="url(#gold)" font-family="Inter Tight, sans-serif" letter-spacing="-1">DPC</text>
-  <text font-size="8.4" font-weight="700" letter-spacing="1.1" fill="url(#gold)" font-family="Inter Tight, sans-serif"><textPath href="#ring" startOffset="0">DOKONA PAPUA CONSTRUCTION LIMITED ·</textPath></text>
-</svg>`;
+export const dpcLogo = (size = 64) =>
+  `<img class="dpc-logo" src="${images.logo}" width="${size}" height="${size}" alt="${esc(site.companyShort)} – ${esc(site.company)}" />`;
 
 export function renderPage(root) {
   const { hero, built, frame, stats, floorplan, water, views, closing, compare, footer } = S;

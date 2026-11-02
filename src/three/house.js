@@ -2,7 +2,7 @@
  * Procedural low-poly model of the MOTO HOUSE – 2 Bedroom House (DPC).
  * Follows the DPC concept set: 7000 × 6000 plan + 1728 verandah, skillion roof rising toward
  * the verandah, white weatherboard, louvre windows, low black piles, centre hallway with rear
- * steps, rainwater tank beside the rear corner. Light-gauge galvanised steel frame inside.
+ * steps, rear gutter and downpipes. Light-gauge galvanised steel frame inside.
  *
  * Units: metres. x = width (7 m, +x = right side / kitchen side), z = depth (+z = front / verandah), y = up.
  * Artistic approximation for the ad film only — NOT construction data.
@@ -40,7 +40,6 @@ export const COLORS = {
   louvre: '#5a4532',
   door: '#9a6a3c',
   deck: '#7a5638',
-  tank: '#c9cfd2',
   slab: '#b9b8b2',
 };
 
@@ -148,7 +147,7 @@ function louvreWindow(w, h, M, split = true) {
 }
 
 /**
- * Build the house. Returns { group, roof, tank, interior, exterior, frame, materials }.
+ * Build the house. Returns { group, roof, interior, exterior, frame, materials }.
  * `roof` can be lifted / faded (exploded view); `frame` is the steel skeleton inside the walls.
  */
 export function buildHouse() {
@@ -170,7 +169,6 @@ export function buildHouse() {
     louvre: mat(COLORS.louvre, { roughness: 0.6 }),
     door: mat(COLORS.door, { roughness: 0.55 }),
     glass: mat('#1b2328', { roughness: 0.2, metalness: 0.5 }),
-    tank: new THREE.MeshStandardMaterial({ map: ribTex(COLORS.tank, 18, 0.72, 1.12), roughness: 0.35, metalness: 0.55 }),
     slab: mat(COLORS.slab, { roughness: 0.9 }),
     gutter: mat('#f4f4f2', { roughness: 0.4, metalness: 0.2 }),
     floor: mat('#c9a77d', { roughness: 0.7 }),
@@ -178,8 +176,6 @@ export function buildHouse() {
     interiorWall: mat('#f4f1ea', { roughness: 0.9 }),
     lamp: new THREE.MeshStandardMaterial({ color: '#2a2a2a', emissive: '#ffd59a', emissiveIntensity: 1.4 }),
   };
-  M.tank.map.repeat.set(1, 14);
-  M.tank.map.rotation = Math.PI / 2;
 
   const exterior = new THREE.Group();
   const interior = new THREE.Group();
@@ -324,41 +320,13 @@ export function buildHouse() {
   roof.add(box(roofW, 0.16, 0.04, M.trim, 0, vTop - vDrop - 0.05, vEnd + 0.02));
   for (const s of [1, -1]) roof.add(box(0.03, 0.22, verandah, M.louvre, s * halfX, vTop - vDrop / 2 - 0.22, (vz0 + vz1) / 2)); // slatted infill
 
-  /* ── rainwater tank (right side, toward the rear) ── */
-  const tank = new THREE.Group();
-  const tankPos = V(-halfX - 1.35, 0, -1.4); // on the right when facing the rear wall (as in the rear renders)
-  const tankR = 1.0, tankH = 1.9, slabH = 0.18;
-  tank.add(box(2.4, slabH, 2.4, M.slab, 0, slabH / 2, 0));
-  const cyl = new THREE.Mesh(new THREE.CylinderGeometry(tankR, tankR, tankH, 48), M.tank);
-  cyl.position.y = slabH + tankH / 2;
-  tank.add(cyl);
-  const lid = new THREE.Mesh(new THREE.CylinderGeometry(0.15, tankR, 0.25, 48), M.gutter);
-  lid.position.y = slabH + tankH + 0.125;
-  tank.add(lid);
-  const lbl = canvasTex(256, 96, (g) => {
-    g.font = '800 34px sans-serif';
-    g.fillStyle = '#23262a';
-    g.textAlign = 'center';
-    g.fillText('2500 LITRES', 128, 42);
-    g.font = '700 22px sans-serif';
-    g.fillText('WATER TANKS', 128, 76);
-  });
-  lbl.wrapS = lbl.wrapT = THREE.ClampToEdgeWrapping;
-  const label = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.38), new THREE.MeshBasicMaterial({ map: lbl, transparent: true }));
-  label.position.set(-tankR - 0.01, slabH + tankH * 0.62, 0);
-  label.rotation.y = -Math.PI / 2;
-  tank.add(label);
-  tank.position.copy(tankPos);
-  group.add(tank);
-  const dpx = -(halfX + oh - 0.1);
-  const tankTop = slabH + tankH + 0.2;
-  const pts = [V(dpx, gY, z0 - 0.08), V(dpx, tankTop + 0.3, z0 - 0.08), V(tankPos.x, tankTop + 0.3, tankPos.z - 0.3), V(tankPos.x, tankTop, tankPos.z - 0.3)];
-  const path = new THREE.CurvePath();
-  for (let i = 0; i < pts.length - 1; i++) path.add(new THREE.LineCurve3(pts[i], pts[i + 1]));
-  group.add(new THREE.Mesh(new THREE.TubeGeometry(path, 40, 0.045, 8, false), M.gutter));
-  const dp2 = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, gY), M.gutter);
-  dp2.position.set(-dpx, gY / 2, z0 - 0.08);
-  group.add(dp2);
+  /* ── downpipes from the rear gutter to the ground (no tank in the ad model) ── */
+  const dpx = halfX + oh - 0.1;
+  for (const sx of [1, -1]) {
+    const dp = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, gY), M.gutter);
+    dp.position.set(sx * dpx, gY / 2, z0 - 0.08);
+    group.add(dp);
+  }
 
   /* ── interior: partitions, wet-area tiles, furniture ── */
   const ih = wallH - 0.05;
@@ -415,9 +383,8 @@ export function buildHouse() {
       o.receiveShadow = true;
     }
   });
-  label.castShadow = false;
 
-  return { group, roof, tank, interior, exterior, frame, materials: M };
+  return { group, roof, interior, exterior, frame, materials: M };
 }
 
 /** Warm tropical-afternoon lighting rig. */

@@ -48,6 +48,7 @@ export const site = {
 };
 
 export const images = {
+  logo: A('dpc-logo.png'), // DPC company logo (transparent PNG)
   rearIso: A('render-rear-iso.jpg'),
   // Section 3 crossfades to the right elevation (shows steps, louvres, raised floor, gutter + downpipe).
   front: A('render-right.jpg'),
@@ -220,6 +221,10 @@ export const ad = {
   price: '100K',
   supply: 'Supply only',
   supplySub: '2 bedrooms · 1 bathroom · 1 home',
+  rainLead: 'Rain in. Water stored.',
+  rainCount: 2500, // TODO: confirm (renders 2,500 L · drawings 9,000 L)
+  rainLabel: 'Litre rainwater tank',
   comingSoon: 'Coming soon',
+  outroTag: 'Proposed Rural Housing · Architectural Concept Proposal',
   disclaimer: '3D render may vary from actual/final design',
 };
