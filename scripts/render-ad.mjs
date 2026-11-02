@@ -3,6 +3,7 @@
  *
  *   npm run render:ad                 # 16:9  1920×1080 → public/media/moto-house-ad.mp4
  *   npm run render:ad -- --vertical   # 9:16  1080×1920 → public/media/moto-house-ad-vertical.mp4
+ *   npm run render:ad -- --square     # 1:1   1080×1080 → public/media/moto-house-ad-square.mp4
  *   npm run render:ad -- --fps 24 --scale 0.5   # quicker draft
  *
  * Needs Playwright + Chromium and ffmpeg (libx264) on PATH.
@@ -22,11 +23,12 @@ const flag = (n, d) => {
   return i < 0 ? d : args[i + 1];
 };
 const vertical = args.includes('--vertical');
+const square = args.includes('--square');
 const fps = +flag('fps', 30);
 const scale = +flag('scale', 1);
-const W = Math.round((vertical ? 1080 : 1920) * scale);
-const H = Math.round((vertical ? 1920 : 1080) * scale);
-const name = vertical ? 'moto-house-ad-vertical' : 'moto-house-ad';
+const W = Math.round((vertical || square ? 1080 : 1920) * scale);
+const H = Math.round((square ? 1080 : vertical ? 1920 : 1080) * scale);
+const name = square ? 'moto-house-ad-square' : vertical ? 'moto-house-ad-vertical' : 'moto-house-ad';
 const framesDir = path.join(root, '.ad-frames', name);
 const outDir = path.join(root, 'public/media');
 await fs.rm(framesDir, { recursive: true, force: true });
@@ -36,7 +38,7 @@ await fs.mkdir(outDir, { recursive: true });
 const server = await createServer({ root, logLevel: 'error', server: { port: 5198 } });
 await server.listen();
 const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
-const url = `http://localhost:${server.config.server.port}/ad.html?capture=1${vertical ? '&format=vertical' : ''}`;
+const url = `http://localhost:${server.config.server.port}/ad.html?capture=1${square ? '&format=square' : vertical ? '&format=vertical' : ''}`;
 let page;
 async function openPage() {
   if (page) await page.close().catch(() => {});

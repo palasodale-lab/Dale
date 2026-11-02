@@ -17,12 +17,14 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 
 const params = new URLSearchParams(location.search);
 const capture = params.has('capture');
-const vertical = params.get('format') === 'vertical';
+const square = params.get('format') === 'square';
+const vertical = params.get('format') === 'vertical' || square; // square reuses the stacked (vertical) layout
 const DUR = 25;
 
 /* ───────────── DOM ───────────── */
 const el = document.getElementById('ad');
 el.classList.toggle('is-vertical', vertical);
+el.classList.toggle('is-square', square);
 document.body.classList.toggle('is-capture', capture);
 const m = (t, cls = '') => `<span class="mask ${cls}"><span>${t}</span></span>`;
 const logoImg = (cls = '') => `<img class="${cls}" src="${images.logo}" alt="DPC – Dokona Papua Construction Limited" />`;
@@ -291,7 +293,7 @@ const col = new THREE.Color();
 function update(time) {
   renderer.toneMappingExposure = S.exposure;
   const vw = el.clientWidth, vh = el.clientHeight;
-  const vert = vw < vh;
+  const vert = vw <= vh;
   const i = Math.min(palette.length - 2, Math.floor(S.glowI));
   col.copy(palette[i]).lerp(palette[i + 1], S.glowI - i);
   document.documentElement.style.setProperty('--accent', '#' + col.getHexString());
@@ -315,7 +317,7 @@ function update(time) {
 
   // camera
   const { theta, phi, ty } = S;
-  const r = S.r * (vert ? 1.12 : 1);
+  const r = S.r * (vert ? (square ? 1.18 : 1.12) : 1);
   look.set(0, ty, 0.3);
   camera.position.set(look.x + r * Math.cos(phi) * Math.sin(theta), look.y + r * Math.sin(phi) + 0.2, look.z + r * Math.cos(phi) * Math.cos(theta));
   camera.lookAt(look);
@@ -348,8 +350,8 @@ function resize() {
   const h = el.clientHeight;
   renderer.setSize(w, h, false);
   camera.aspect = introCam.aspect = w / h;
-  camera.fov = w / h < 1 ? 52 : 32; // vertical cut needs a wider lens to keep the house in frame
-  introCam.fov = w / h < 1 ? 48 : 30;
+  camera.fov = w / h < 0.9 ? 52 : w / h < 1.1 ? 40 : 32; // taller frames need a wider lens to keep the house in
+  introCam.fov = w / h < 0.9 ? 48 : w / h < 1.1 ? 38 : 30;
   camera.updateProjectionMatrix();
   introCam.updateProjectionMatrix();
 }
