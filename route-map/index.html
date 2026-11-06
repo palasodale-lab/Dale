@@ -1,0 +1,536 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Dokona Papua Construction – China Mission Route</title>
+<style>
+  :root{
+    --gold:#f2c35b; --gold2:#ffdf9a; --navy:#040a18; --ink:#e9eef8; --muted:#8fa3c4;
+  }
+  html,body{margin:0;height:100%;background:var(--navy);overflow:hidden;font-family:Inter, "Inter Display", sans-serif;color:var(--ink)}
+  #stage{position:fixed;inset:0;width:1920px;height:1080px}
+  canvas{position:absolute;inset:0;width:1920px;height:1080px}
+  #fx{pointer-events:none}
+  #ui{position:absolute;inset:0;pointer-events:none}
+  .abs{position:absolute;left:0;top:0;will-change:transform,opacity}
+  /* pins */
+  .pin{width:0;height:0}
+  .pin .dot{position:absolute;left:-9px;top:-9px;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle,#fff6dc 0,#f2c35b 45%,rgba(242,195,91,0) 72%)}
+  .pin svg{position:absolute;left:-17px;top:-46px;filter:drop-shadow(0 0 10px rgba(242,195,91,.8))}
+  .label{white-space:nowrap;transform-origin:0 50%}
+  .card{display:inline-flex;flex-direction:column;gap:3px;padding:12px 18px 12px 16px;border-radius:10px;
+        background:linear-gradient(135deg,rgba(9,20,44,.86),rgba(14,30,62,.72));border:1px solid rgba(242,195,91,.55);
+        box-shadow:0 0 24px rgba(242,195,91,.18),inset 0 0 18px rgba(80,140,255,.07);backdrop-filter:blur(2px)}
+  .card .k{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:600}
+  .card .t{font-size:24px;font-weight:600;letter-spacing:.01em;color:#fff}
+  .card .s{font-size:15px;color:var(--muted);font-weight:400}
+  .leader{position:absolute;height:1.5px;background:linear-gradient(90deg,rgba(242,195,91,.9),rgba(242,195,91,.25));transform-origin:0 50%}
+  .city{font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:rgba(170,195,235,.7);font-weight:500;white-space:nowrap}
+  .city::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:rgba(170,195,235,.8);margin-right:8px;vertical-align:middle;transform:translateY(-2px)}
+  .icon{width:0;height:0}
+  .icon .b{position:absolute;left:-26px;top:-26px;width:52px;height:52px;border-radius:14px;background:linear-gradient(160deg,#13284f,#0a1631);
+           border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:0 0 26px rgba(242,195,91,.45)}
+  .icon .tag{position:absolute;left:-20px;top:30px;width:40px;text-align:center;font-size:14px;font-weight:700;color:var(--gold2);letter-spacing:.04em}
+  .veh{width:0;height:0}
+  .veh .p{position:absolute;left:-30px;top:-30px;width:60px;height:60px;filter:drop-shadow(0 0 12px rgba(255,220,150,.9)) drop-shadow(0 6px 8px rgba(0,0,0,.55))}
+  .veh .c{position:absolute;left:-21px;top:-21px;width:42px;height:42px;border-radius:50%;background:#fff6dc;display:flex;align-items:center;justify-content:center;
+          box-shadow:0 0 18px rgba(255,220,150,.95)}
+  .badge{width:0;height:0}
+  .badge .n{position:absolute;left:-19px;top:-19px;width:38px;height:38px;border-radius:50%;background:var(--gold);color:#0a1631;font-weight:800;font-size:19px;
+            display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px rgba(242,195,91,.8)}
+  .badge .bl{position:absolute;top:-13px;font-size:16px;font-weight:600;color:#fff;white-space:nowrap;letter-spacing:.02em}
+  .badge .bl small{display:block;font-size:13px;color:var(--gold);font-weight:500;letter-spacing:.08em;margin-top:2px}
+  /* chrome */
+  #chip{left:72px;top:64px}
+  #chip .sc{font-size:14px;letter-spacing:.32em;color:var(--gold);font-weight:600;text-transform:uppercase}
+  #chip .d{font-size:40px;font-weight:300;letter-spacing:.01em;margin-top:6px}
+  #chip .d b{font-weight:600}
+  #chip .ln{width:64px;height:2px;background:var(--gold);margin-top:14px}
+  #brand{right:72px;top:68px;text-align:right;font-size:13px;letter-spacing:.3em;text-transform:uppercase;color:rgba(200,215,240,.75);font-weight:500}
+  #brand b{display:block;color:#fff;font-weight:700;letter-spacing:.22em;font-size:15px;margin-bottom:4px}
+  #tl{left:160px;top:950px;width:1600px;height:80px}
+  #tl .rail{position:absolute;left:0;right:0;top:22px;height:2px;background:rgba(150,175,215,.25)}
+  #tl .fill{position:absolute;left:0;top:21px;height:4px;background:linear-gradient(90deg,#c9932f,var(--gold2));box-shadow:0 0 14px rgba(242,195,91,.7);border-radius:2px}
+  #tl .tick{position:absolute;top:0;width:0}
+  #tl .tick i{position:absolute;left:-6px;top:17px;width:12px;height:12px;border-radius:50%;background:#0b1834;border:2px solid rgba(150,175,215,.5);box-sizing:border-box}
+  #tl .tick span{position:absolute;left:-60px;width:120px;text-align:center;top:40px;font-size:14px;color:var(--muted);letter-spacing:.06em;font-weight:500}
+  #tl .tick em{position:absolute;left:-90px;width:180px;text-align:center;top:-14px;font-style:normal;font-size:13px;color:var(--gold);letter-spacing:.08em;font-weight:600;white-space:nowrap}
+  #tl .tick.on i{border-color:var(--gold);background:var(--gold);box-shadow:0 0 12px var(--gold)}
+  #tl .tick.on span{color:#fff}
+  /* cards */
+  .full{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  #title .co{font-size:30px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);font-weight:600}
+  #title .h{font-size:76px;font-weight:300;line-height:1.08;margin-top:26px;letter-spacing:-.01em}
+  #title .h b{font-weight:700}
+  #title .rule{width:120px;height:2px;background:var(--gold);margin:36px 0 30px;box-shadow:0 0 12px var(--gold)}
+  #title .dt{font-size:28px;letter-spacing:.24em;color:#d6e0f2;font-weight:400;text-transform:uppercase}
+  #end .co{font-size:64px;font-weight:700;letter-spacing:.06em}
+  #end .mc{font-size:30px;letter-spacing:.6em;text-transform:uppercase;color:var(--gold);margin-top:28px;font-weight:600;padding-left:.6em}
+  #end .sub{font-size:20px;letter-spacing:.18em;color:var(--muted);margin-top:30px;text-transform:uppercase}
+  #shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,8,20,.7) 0,rgba(3,8,20,0) 220px,rgba(3,8,20,0) 820px,rgba(3,8,20,.85) 100%),radial-gradient(ellipse at center,rgba(4,10,24,0) 45%,rgba(2,6,16,.7) 100%)}
+  #black{position:absolute;inset:0;background:#030814}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <canvas id="fx"></canvas>
+  <div id="ui"></div>
+</div>
+<script src="node_modules/d3-array/dist/d3-array.min.js"></script>
+<script src="node_modules/d3-geo/dist/d3-geo.min.js"></script>
+<script src="node_modules/topojson-client/dist/topojson-client.min.js"></script>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
+import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
+
+const W = 1920, H = 1080, DPR = window.devicePixelRatio || 1;
+const D2R = Math.PI/180;
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const easeOut=t=>1-Math.pow(1-t,3);
+const smooth=t=>t*t*t*(t*(t*6-15)+10);
+// fade in over [a,a+fi], hold, fade out over [b-fo,b]
+const win=(t,a,b,fi=.6,fo=.6)=>Math.min(clamp((t-a)/fi), b==null?1:clamp((b-t)/fo));
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+
+function vec(lat,lon,r=1){ const p=lat*D2R,l=lon*D2R; return new THREE.Vector3(r*Math.cos(p)*Math.cos(l), r*Math.sin(p), -r*Math.cos(p)*Math.sin(l)); }
+function slerpLL(a,b,t){ // great-circle interpolation between [lat,lon]
+  const A=vec(a[0],a[1]),B=vec(b[0],b[1]); const om=A.angleTo(B);
+  if(om<1e-9) return A; const s=Math.sin(om);
+  return A.multiplyScalar(Math.sin((1-t)*om)/s).add(B.multiplyScalar(Math.sin(t*om)/s));
+}
+
+// ---------- data ----------
+const P = {
+  POM:[-9.443,147.22], GZ:[23.135,113.33], FS:[23.02,113.12], ZS:[22.517,113.392],
+  TSN:[39.124,117.346], CZ:[38.304,116.839], BX:[37.15,118.13], CAN:[23.392,113.299]
+};
+const F1=[37.23,118.03], F2=[37.09,118.24], F3=[37.21,118.27];
+
+// ---------- renderer ----------
+const canvas=document.getElementById('gl');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true,logarithmicDepthBuffer:true});
+renderer.setPixelRatio(DPR); renderer.setSize(W,H,false);
+renderer.setClearColor(0x040a18,1);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(35,W/H,0.001,50);
+
+// background stars
+{
+  const n=2600, pos=new Float32Array(n*3), col=new Float32Array(n*3); let s=7;
+  const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
+  for(let i=0;i<n;i++){ const u=rnd()*2-1,th=rnd()*Math.PI*2,r=30; const q=Math.sqrt(1-u*u);
+    pos.set([r*q*Math.cos(th),r*u,r*q*Math.sin(th)],i*3); const b=.25+rnd()*.6; col.set([b*.8,b*.88,b],i*3); }
+  const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.BufferAttribute(pos,3)); g.setAttribute('color',new THREE.BufferAttribute(col,3));
+  scene.add(new THREE.Points(g,new THREE.PointsMaterial({size:1.6*DPR,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:.8,depthWrite:false})));
+}
+
+const loader=new THREE.TextureLoader();
+const loadTex=u=>new Promise(r=>loader.load(u,t=>{t.anisotropy=8;r(t)}));
+const [texDay,texTopo]=await Promise.all([
+  loadTex('node_modules/three-globe/example/img/earth-blue-marble.jpg'),
+  loadTex('node_modules/three-globe/example/img/earth-topology.png')]);
+texDay.colorSpace=THREE.NoColorSpace;
+
+const topo=await (await fetch('node_modules/world-atlas/countries-10m.json')).json();
+// hi-res land mask
+const maskC=document.createElement('canvas'); maskC.width=8192; maskC.height=4096;
+{
+  const ctx=maskC.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,8192,4096);
+  const proj=d3.geoEquirectangular().scale(8192/(2*Math.PI)).translate([4096,2048]);
+  const path=d3.geoPath(proj,ctx); ctx.fillStyle='#fff'; for(const ft of topojson.feature(topo,topo.objects.countries).features){ if(ft.id==='010'||!ft.geometry) continue;
+    const polys=ft.geometry.type==='Polygon'?[ft.geometry.coordinates]:ft.geometry.coordinates;
+    for(const poly of polys){ let g={type:'Polygon',coordinates:poly}; if(d3.geoArea(g)>2*Math.PI) g={type:'Polygon',coordinates:poly.map(r=>r.slice().reverse())};
+      ctx.beginPath(); path(g); ctx.fill(); } }
+}
+const texMask=new THREE.CanvasTexture(maskC); texMask.anisotropy=8; texMask.generateMipmaps=true; texMask.minFilter=THREE.LinearMipmapLinearFilter;
+
+const globeMat=new THREE.ShaderMaterial({
+  uniforms:{day:{value:texDay},topo:{value:texTopo},mask:{value:texMask},camPos:{value:new THREE.Vector3()},detail:{value:0},glow:{value:1}},
+  vertexShader:`
+    #include <common>
+    #include <logdepthbuf_pars_vertex>
+    varying vec2 vUv; varying vec3 vN; varying vec3 vW;
+    void main(){ vUv=uv; vN=normalize(position); vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz;
+      gl_Position=projectionMatrix*viewMatrix*w;
+      #include <logdepthbuf_vertex>
+    }`,
+  fragmentShader:`
+    #include <logdepthbuf_pars_fragment>
+    uniform sampler2D day,topo,mask; uniform vec3 camPos; uniform float detail,glow;
+    varying vec2 vUv; varying vec3 vN; varying vec3 vW;
+    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+      return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+    void main(){
+      #include <logdepthbuf_fragment>
+      vec3 c=texture2D(day,vUv).rgb; float lum=dot(c,vec3(.3,.59,.11));
+      float land=texture2D(mask,vUv).r;
+      vec2 px=vec2(1./2048.,1./1024.);
+      float h=texture2D(topo,vUv).r;
+      float hx=texture2D(topo,vUv+vec2(px.x,0.)).r-texture2D(topo,vUv-vec2(px.x,0.)).r;
+      float hy=texture2D(topo,vUv+vec2(0.,px.y)).r-texture2D(topo,vUv-vec2(0.,px.y)).r;
+      // fine procedural relief for close-ups
+      vec2 q=vUv*vec2(4096.,2048.)*14.;
+      float n1=detail>0.?noise(q)*.6+noise(q*2.3)*.4:0.5;
+      float hill=clamp(.55+(-hx*1.6+hy*1.6)*6.0,0.,1.);
+      vec3 ocean=mix(vec3(.012,.035,.09),vec3(.02,.07,.16),clamp(lum*3.,0.,1.));
+      vec3 landc=mix(vec3(.05,.12,.25),vec3(.12,.24,.42),clamp(lum*2.2,0.,1.));
+      landc*= mix(.62+.75*hill, .85+.3*hill, detail);
+      landc+= detail*(n1-.5)*vec3(.02,.04,.07);
+      // glowing topographic contours
+      float ch=h*14.+n1*detail*.15; float fw=fwidth(ch);
+      float contour = (1.-smoothstep(0.,fw*1.5,min(fract(ch),1.-fract(ch))));
+      landc+= contour*smoothstep(.04,.5,h)*vec3(.12,.32,.55)*.55*glow;
+      landc+= smoothstep(.25,.9,h)*vec3(.08,.2,.35)*.6;
+      // close-up tech dot matrix + fine graticule
+      vec2 dg=vUv*vec2(360.,180.)*12.; vec2 dc=fract(dg)-.5; float dfw=fwidth(dg.x);
+      float spc=1./max(dfw,1e-5); float dotm=(1.-smoothstep(.06,.06+dfw*1.2,length(dc)))*detail*clamp((spc-7.)/6.,0.,1.)*clamp((60.-spc)/25.,0.,1.);
+      landc+=dotm*vec3(.15,.3,.5)*.45;
+      vec2 fg=vUv*vec2(360.,180.); vec2 ff=abs(fract(fg)-.5); vec2 fw2=fwidth(fg);
+      float fl=max(1.-smoothstep(0.,fw2.x*1.2,.5-ff.x),1.-smoothstep(0.,fw2.y*1.2,.5-ff.y))*detail;
+      vec3 col=mix(ocean,landc,land);
+      col+=fl*vec3(.15,.25,.45)*.35;
+      // lat/lon grid
+      vec2 g=vec2(vUv.x*36.,vUv.y*18.); vec2 gf=abs(fract(g)-.5); vec2 gw=fwidth(g);
+      float gl=max(1.-smoothstep(0.,gw.x*1.2,.5-gf.x),1.-smoothstep(0.,gw.y*1.2,.5-gf.y));
+      col+= gl*vec3(.12,.2,.35)*.35;
+      // view lighting + rim
+      vec3 V=normalize(camPos-vW); float nd=clamp(dot(vN,V),0.,1.);
+      col*= .55+.6*pow(nd,.6);
+      col+= pow(1.-nd,3.)*vec3(.15,.35,.75)*.9;
+      gl_FragColor=vec4(col,1.);
+    }`
+});
+globeMat.extensions={derivatives:true};
+const globe=new THREE.Mesh(new THREE.SphereGeometry(1,360,180),globeMat);
+scene.add(globe);
+
+// atmosphere
+const atm=new THREE.Mesh(new THREE.SphereGeometry(1.06,128,64),new THREE.ShaderMaterial({
+  uniforms:{camPos:{value:new THREE.Vector3()}},
+  vertexShader:`#include <common>
+    #include <logdepthbuf_pars_vertex>
+    varying vec3 vN; varying vec3 vW; void main(){vN=normalize(position);vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;
+    #include <logdepthbuf_vertex>
+    }`,
+  fragmentShader:`#include <logdepthbuf_pars_fragment>
+    uniform vec3 camPos; varying vec3 vN; varying vec3 vW;
+    void main(){
+      #include <logdepthbuf_fragment>
+      vec3 V=normalize(camPos-vW); float d=dot(vN,V); float a=pow(clamp(1.-abs(d),0.,1.),5.)*1.3;
+      gl_FragColor=vec4(vec3(.25,.55,1.)*a,a);}`,
+  side:THREE.BackSide,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
+scene.add(atm);
+
+// coastlines & borders
+const fatMats=[];
+function segGeom(mls,r,box){
+  const arr=[]; const inb=p=>!box||(p[0]>=box[0]&&p[0]<=box[2]&&p[1]>=box[1]&&p[1]<=box[3]);
+  for(const line of mls.coordinates){ for(let i=0;i<line.length-1;i++){ if(!inb(line[i])&&!inb(line[i+1])) continue; const a=vec(line[i][1],line[i][0],r),b=vec(line[i+1][1],line[i+1][0],r); arr.push(a.x,a.y,a.z,b.x,b.y,b.z);} }
+  const g=new LineSegmentsGeometry(); g.setPositions(arr); return g;
+}
+function lmat(color,width,opacity,add=false){
+  const m=new LineMaterial({color,linewidth:width*DPR,transparent:true,opacity,depthWrite:false,blending:add?THREE.AdditiveBlending:THREE.NormalBlending});
+  m.resolution.set(W*DPR,H*DPR); fatMats.push(m); return m;
+}
+const topo50=await (await fetch('node_modules/world-atlas/countries-50m.json')).json();
+const mk=(o,G)=>{const l=new LineSegments2(G,o); l.frustumCulled=false; scene.add(l); return l;};
+const AS=[95,-25,165,50];               // region of interest for far LOD
+const NEAR=[108,20,124,42];             // China close-up region for 10m detail
+const c50=segGeom(topojson.mesh(topo50,topo50.objects.countries,(a,b)=>a===b),1.00015,AS);
+const b50=segGeom(topojson.mesh(topo50,topo50.objects.countries,(a,b)=>a!==b),1.0002,AS);
+const c10=segGeom(topojson.mesh(topo,topo.objects.countries,(a,b)=>a===b),1.00015,NEAR);
+const b10=segGeom(topojson.mesh(topo,topo.objects.countries,(a,b)=>a!==b),1.0002,NEAR);
+const coastFar=mk(lmat(0x8cc4ff,1.2,.7),c50), coastGlow=mk(lmat(0x3f8cff,4,.2,true),c50), bordFar=mk(lmat(0x9fb6dc,1,.4),b50);
+const prov=await (await fetch('china_prov.json')).json();
+const provL=mk(lmat(0x86a9e6,1.3,.4),segGeom(prov,1.0002,null)), provGlow=mk(lmat(0x3f7fe0,4,.12,true),segGeom(prov,1.0002,null));
+const coastNear=mk(lmat(0x8cc4ff,1.5,.8),c10), coastGlowN=mk(lmat(0x3f8cff,5,.22,true),c10), bordNear=mk(lmat(0x9fb6dc,1.1,.45),b10);
+
+// ---------- routes ----------
+function densify(pts,per=60){ const out=[]; for(let i=0;i<pts.length-1;i++){ for(let k=0;k<per;k++) out.push(slerpLL(pts[i],pts[i+1],k/per)); } out.push(vec(...pts[pts.length-1])); return out; }
+function airPath(a,b,n=240){ const om=vec(...a).angleTo(vec(...b)); const hgt=Math.min(.12,om*.17);
+  const out=[]; for(let i=0;i<=n;i++){ const t=i/n; out.push(slerpLL(a,b,t).normalize().multiplyScalar(1.0004+hgt*Math.sin(Math.PI*t))); } return out; }
+function roadPath(pts){ return densify(pts,50).map(v=>v.normalize().multiplyScalar(1.0003)); }
+
+const routes=[];
+function addRoute(o){
+  const pts=o.type==='air'?airPath(o.from,o.to):roadPath(o.pts);
+  o.pts=pts; o.cum=[0]; for(let i=1;i<pts.length;i++) o.cum.push(o.cum[i-1]+pts[i].distanceTo(pts[i-1]));
+  o.len=o.cum[o.cum.length-1];
+  if(o.draw!==false){
+    const arr=[]; pts.forEach(p=>arr.push(p.x,p.y,p.z));
+    const g=new LineGeometry(); g.setPositions(arr);
+    o.glow=new Line2(g,lmat(0xf2a93b,11,.28,true)); o.core=new Line2(g,lmat(0xfff2cf,2.6,1));
+    o.mid=new Line2(g,lmat(0xf2c35b,5,.85,true));
+    for(const l of [o.glow,o.mid,o.core]){l.frustumCulled=false;l.renderOrder=5;scene.add(l);}
+    o.nseg=pts.length-1;
+  }
+  routes.push(o); return o;
+}
+function at(o,u){ // point along route by arc length fraction
+  const d=u*o.len; let i=1; while(i<o.cum.length-1&&o.cum[i]<d) i++;
+  const f=(d-o.cum[i-1])/Math.max(1e-9,o.cum[i]-o.cum[i-1]); return o.pts[i-1].clone().lerp(o.pts[i],clamp(f));
+}
+const R={
+  pomCan: addRoute({type:'air',from:P.POM,to:P.GZ,t0:8.6,t1:13.8,veh:'plane'}),
+  gzFs:   addRoute({type:'road',pts:[P.GZ,[23.10,113.25],[23.06,113.18],P.FS],t0:19.4,t1:20.9,veh:'car'}),
+  fsGz:   addRoute({type:'road',pts:[P.FS,[23.06,113.18],[23.10,113.25],P.GZ],t0:22.4,t1:23.6,veh:'car',draw:false}),
+  gzZs:   addRoute({type:'road',pts:[P.GZ,[22.98,113.36],[22.80,113.33],[22.66,113.37],P.ZS],t0:24.0,t1:25.8,veh:'car'}),
+  zsGz:   addRoute({type:'road',pts:[P.ZS,[22.66,113.37],[22.80,113.33],[22.98,113.36],P.GZ],t0:27.4,t1:28.8,veh:'car',draw:false}),
+  canTsn: addRoute({type:'air',from:P.GZ,to:P.TSN,t0:31.6,t1:35.4,veh:'plane'}),
+  tsnCz:  addRoute({type:'road',pts:[P.TSN,[38.92,117.12],[38.62,116.97],P.CZ],t0:36.0,t1:38.4,veh:'car'}),
+  czBx:   addRoute({type:'road',pts:[P.CZ,[37.92,117.18],[37.62,117.58],[37.38,117.95],P.BX],t0:49.0,t1:52.0,veh:'car'}),
+  bxCan:  addRoute({type:'air',from:P.BX,to:P.CAN,t0:62.6,t1:66.2,veh:'plane'}),
+  canPom: addRoute({type:'air',from:P.CAN,to:P.POM,t0:66.8,t1:72.4,veh:'plane'}),
+};
+
+// ---------- camera keyframes [t, lat, lon, alt, tilt, heading] ----------
+const K=[
+  [0,   -4, 128, 3.6, 0, 0],
+  [6,   -12,146, 1.35, 18, -8],
+  [8.6, -8, 143, 1.30, 24, -12],
+  [13.6, 15,121, 1.15, 26, -10],
+  [16.2, 23.0,113.36,0.075,46,-8],
+  [17.2, 23.0,113.34,0.07,46,-6],
+  [19.0, 22.84,113.27,0.036,42,-4],
+  [23.5, 22.86,113.29,0.034,44,4],
+  [28.8, 22.88,113.28,0.036,40,8],
+  [31.4, 30.5,115.8,0.55,22,0],
+  [35.2, 35.4,116.6,0.38,26,-4],
+  [38.4, 38.55,117.05,0.085,40,-6],
+  [41.2, 38.45,117.0,0.07,42,-8],
+  [43.2, 38.27,116.84,0.022,50,-12],
+  [47.0, 38.26,116.85,0.020,52,-24],
+  [49.2, 37.78,117.45,0.13,34,-6],
+  [52.2, 37.25,118.05,0.075,40,6],
+  [54.2, 37.12,118.14,0.034,48,10],
+  [60.0, 37.12,118.15,0.030,50,22],
+  [62.6, 30.5,117.5,1.15,18,0],
+  [66.2, 18,123,1.35,20,-4],
+  [72.4, -4,140,1.05,24,-8],
+  [74.2, -6,143,0.95,26,-10],
+  [78.0, 13,129,1.75,8,0],
+  [86,   13,129,1.65,6,0],
+  [92,   13,129,1.9,4,0],
+];
+function camState(t){
+  let i=0; while(i<K.length-2&&t>K[i+1][0]) i++;
+  const a=K[i],b=K[i+1]; const s=ease(clamp((t-a[0])/(b[0]-a[0])));
+  return { lat:lerp(a[1],b[1],s), lon:lerp(a[2],b[2],s), alt:Math.exp(lerp(Math.log(a[3]),Math.log(b[3]),s)), tilt:lerp(a[4],b[4],s), head:lerp(a[5],b[5],s) };
+}
+function placeCamera(t){
+  const c=camState(t);
+  const la=c.lat*D2R, lo=c.lon*D2R;
+  const U=vec(c.lat,c.lon,1);
+  const N=new THREE.Vector3(-Math.sin(la)*Math.cos(lo),Math.cos(la),Math.sin(la)*Math.sin(lo));
+  const E=new THREE.Vector3().crossVectors(N,U);
+  const h=c.head*D2R, tl=c.tilt*D2R;
+  const Fd=N.clone().multiplyScalar(Math.cos(h)).add(E.clone().multiplyScalar(Math.sin(h)));
+  const pos=U.clone().add(U.clone().multiplyScalar(c.alt*Math.cos(tl)).sub(Fd.clone().multiplyScalar(c.alt*Math.sin(tl))));
+  camera.position.copy(pos); camera.up.copy(Fd.clone().multiplyScalar(Math.cos(tl)).add(U.clone().multiplyScalar(Math.sin(tl))));
+  camera.lookAt(U);
+  camera.rotateZ(Math.sin(t*.35)*.012+Math.sin(t*.13+1)*.008); // subtle drone sway
+  camera.near=Math.max(c.alt*0.04,0.0004); camera.far=c.alt+4; camera.updateProjectionMatrix();
+  camera.updateMatrixWorld();
+  return c;
+}
+
+// ---------- UI ----------
+const ui=document.getElementById('ui');
+const el=(html,cls='abs')=>{const d=document.createElement('div');d.className=cls;d.innerHTML=html;ui.appendChild(d);return d;};
+const SVG={
+  pin:`<svg width="34" height="46" viewBox="0 0 34 46"><defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe3a3"/><stop offset="1" stop-color="#e0a83c"/></linearGradient></defs><path d="M17 45C17 45 2 27 2 17A15 15 0 0 1 32 17C32 27 17 45 17 45Z" fill="url(#pg)" stroke="#fff3d6" stroke-width="1.5"/><circle cx="17" cy="17" r="6" fill="#0b1834"/></svg>`,
+  plane:`<svg viewBox="0 0 64 64" width="60" height="60"><path d="M32 3c2.6 0 4 3.2 4 7v14l22 13v6l-22-6v12l7 5v5l-11-3-11 3v-5l7-5V37L6 43v-6l22-13V10c0-3.8 1.4-7 4-7z" fill="#ffffff" stroke="#f2c35b" stroke-width="1.6" stroke-linejoin="round"/></svg>`,
+  car:`<svg viewBox="0 0 24 24" width="26" height="26"><path d="M5 11l1.6-4.2A2 2 0 0 1 8.5 5.5h7a2 2 0 0 1 1.9 1.3L19 11h.5A1.5 1.5 0 0 1 21 12.5V17h-2v1.5a1 1 0 0 1-2 0V17H7v1.5a1 1 0 0 1-2 0V17H3v-4.5A1.5 1.5 0 0 1 4.5 11zm2.2 0h9.6l-1.2-3.4a.8.8 0 0 0-.8-.6H9.2a.8.8 0 0 0-.8.6zM6.5 15a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4zm11 0a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4z" fill="#0b1834"/></svg>`,
+  factory:`<svg viewBox="0 0 24 24" width="30" height="30"><path d="M2 21V10l5 3V10l5 3V10l5 3V3h3v18z" fill="none" stroke="#f2c35b" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 17h2M11 17h2M16 17h2" stroke="#ffe3a3" stroke-width="1.6"/></svg>`,
+  gear:`<svg viewBox="0 0 24 24" width="32" height="32"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="none" stroke="#ffe3a3" stroke-width="1.6"/><path d="M10.3 2h3.4l.5 2.6 1.9.8 2.2-1.5 2.4 2.4-1.5 2.2.8 1.9 2.6.5v3.4l-2.6.5-.8 1.9 1.5 2.2-2.4 2.4-2.2-1.5-1.9.8-.5 2.6h-3.4l-.5-2.6-1.9-.8-2.2 1.5-2.4-2.4 1.5-2.2-.8-1.9L2 13.7v-3.4l2.6-.5.8-1.9-1.5-2.2 2.4-2.4 2.2 1.5 1.9-.8z" fill="none" stroke="#f2c35b" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+};
+
+const card=(k,t,s)=>`<div class="card">${k?`<div class="k">${k}</div>`:''}<div class="t">${t}</div>${s?`<div class="s">${s}</div>`:''}</div>`;
+const items=[];
+function addPin(ll,k,t,s,tIn,tOut,opts={}){ const p=el(SVG.pin+'<div class="dot"></div>','abs pin'); const l=el(card(k,t,s),'abs label'); const ln=el('','leader');
+  items.push({kind:'pin',ll,p,l,ln,tIn,tOut,dx:opts.dx??60,dy:opts.dy??-110,hide:opts.hide}); }
+function addIcon(ll,svg,tIn,opts={}){ const d=el(`<div class="b">${svg}</div>${opts.tag?`<div class="tag">${opts.tag}</div>`:''}`,'abs icon'); items.push({kind:'icon',ll,d,tIn,tOut:opts.tOut,pulse:opts.pulse}); return d; }
+function addLabel(ll,k,t,s,tIn,tOut,dx,dy){ const l=el(card(k,t,s),'abs label'); const ln=el('','leader'); items.push({kind:'label',ll,l,ln,tIn,tOut,dx,dy}); }
+function addCity(ll,name,a0,a1){ const d=el(name,'abs city'); items.push({kind:'city',ll,d,a0,a1}); }
+
+const shade=el('','abs'); shade.id='shade';
+// cities (context)
+[[P.POM,'Port Moresby',.4,4],[[39.90,116.40],'Beijing',.12,1.4],[[31.23,121.47],'Shanghai',.12,1.6],[[22.32,114.17],'Hong Kong',.03,1.6],
+ [[22.54,114.06],'Shenzhen',.025,.2],[[22.20,113.54],'Macau',.025,.2],[[36.65,117.12],'Jinan',.05,.6],[[39.08,117.2],'Tianjin',.05,.9],
+ [[14.6,120.98],'Manila',.3,1.8],[[-6.2,106.8],'Jakarta',.3,2],[[25.03,121.56],'Taipei',.2,1.6],[[-12.46,130.84],'Darwin',.3,2],[[1.35,103.82],'Singapore',.3,2],[[37.38,118.02],'Binzhou',.02,.45],[[37.45,116.36],'Dezhou',.02,.6],[[36.81,118.05],'Zibo',.02,.6],[[37.43,118.67],'Dongying',.02,.6],[[38.87,115.46],'Baoding',.02,.6],[[39.52,116.68],'Langfang',.02,.5],[[23.13,113.26],'Guangzhou',.12,.9]
+].forEach(c=>addCity(...c));
+
+addPin(P.POM,'Origin','Port Moresby','Papua New Guinea',5.6,9.0,{dx:60,dy:-90});
+addPin(P.GZ,'Thu 5 Nov · Check-in','Hilton Guangzhou Tianhe','Guangzhou, Guangdong',15.4,19.0);
+addIcon(P.FS,SVG.factory,20.9,{});
+addLabel(P.FS,'Fri 6 Nov','Fastener Factory Inspection','Foshan, Guangdong',21.0,24.0,-420,-120);
+addIcon(P.ZS,SVG.factory,25.8,{});
+addLabel(P.ZS,'Sat 7 Nov','Solar Supplier Factory Inspection','Zhongshan, Guangdong',26.0,29.4,60,40);
+addPin(P.TSN,'Sun 8 Nov · Arrive','Tianjin Binhai Airport',null,35.2,37.6,{dx:60,dy:-100});
+addPin(P.CZ,'Sun 8 Nov · Check-in','Hampton by Hilton Cangzhou','Cangzhou, Hebei',38.3,42.0,{dx:-470,dy:-110});
+addIcon(P.CZ,SVG.gear,43.0,{pulse:true,tOut:48});
+addLabel(P.CZ,'Mon 9 Nov','Machine Inspection & Commissioning','Cangzhou, Hebei',43.4,47.6,70,-130);
+addPin(P.BX,'Tue 10 Nov · Check-in','Home2 Suites by Hilton Binzhou Boxing','Boxing County, Shandong',51.9,55.4,{dx:60,dy:-120});
+addIcon(F1,SVG.factory,54.6,{tag:'#1'}); addIcon(F2,SVG.factory,55.5,{tag:'#2'}); addIcon(F3,SVG.factory,56.4,{tag:'#3'});
+addLabel([37.16,118.18],'Tue 10 – Thu 12 Nov','Coil Factory #1, #2, #3 &amp; Technical Meeting','Boxing County, Shandong',57.0,61.0,-310,190);
+addPin(P.CAN,'Fri 13 Nov · Check-in','Pullman Guangzhou Baiyun Airport','Guangzhou, Guangdong',66.0,69.4,{dx:-500,dy:-100});
+addPin(P.POM,'Sat 14 Nov · Arrive','Port Moresby','Welcome home',72.3,76.4,{dx:60,dy:-100});
+
+// vehicles
+const vehEls={plane:el(`<div class="p">${SVG.plane}</div>`,'abs veh'),car:el(`<div class="c">${SVG.car}</div>`,'abs veh')};
+
+// final badges
+const BADGES=[
+  {n:1,ll:P.GZ, off:[-150,-70], t:'Guangzhou', s:'5 NOV'},
+  {n:2,ll:P.FS, off:[-200,10], t:'Foshan', s:'6 NOV'},
+  {n:3,ll:P.ZS, off:[-130,85], t:'Zhongshan', s:'7 NOV'},
+  {n:4,ll:P.CZ, off:[-150,-40], t:'Cangzhou', s:'8–9 NOV'},
+  {n:5,ll:P.BX, off:[120,20], t:'Boxing', s:'10–12 NOV'},
+  {n:6,ll:P.CAN,off:[110,-70], t:'Guangzhou Baiyun', s:'13 NOV'},
+].map((b,i)=>{ const left=b.off[0]<0;
+  b.d=el(`<div class="n">${b.n}</div><div class="bl" style="${left?'right:30px;text-align:right':'left:30px'}">${b.t}<small>${b.s}</small></div>`,'abs badge');
+  b.ln=el('','leader'); b.i=i; return b; });
+const homeBadge=el(`<div class="n" style="background:#fff;width:30px;height:30px;left:-15px;top:-15px;font-size:13px">PG</div><div class="bl" style="left:26px">Port Moresby<small>5 &amp; 14 NOV</small></div>`,'abs badge');
+
+// chrome
+const chip=el('<div class="sc"></div><div class="d"></div><div class="ln"></div>','abs'); chip.id='chip';
+const brand=el('<b>Dokona Papua Construction</b>China Procurement Mission','abs'); brand.id='brand';
+const tl=el('<div class="rail"></div><div class="fill"></div>','abs'); tl.id='tl';
+const DAYS=[5,6,7,8,9,10,11,12,13,14]; const DOW=['Thu','Fri','Sat','Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const STOPN={5:'1 · Guangzhou',6:'2 · Foshan',7:'3 · Zhongshan',8:'4 · Cangzhou',10:'5 · Boxing',13:'6 · Baiyun',14:'Port Moresby'};
+const ticks=DAYS.map((d,i)=>{ const k=document.createElement('div'); k.className='tick'; k.style.left=(i/(DAYS.length-1)*1600)+'px';
+  k.innerHTML=`<i></i><span>${DOW[i]} ${d} Nov</span>${STOPN[d]?`<em>${STOPN[d]}</em>`:''}`; tl.appendChild(k); return k; });
+
+const black=el('','abs'); black.id='black';
+const title=el(`<div class="co">Dokona Papua Construction</div><div class="h">China Procurement &amp;<br><b>Factory Inspection Mission</b></div><div class="rule"></div><div class="dt">5 – 14 November 2026</div>`,'full'); title.id='title';
+const endc=el(`<div class="co">Dokona Papua Construction</div><div class="mc">Mission Complete</div><div class="sub">China Procurement &amp; Factory Inspection · 5 – 14 Nov 2026</div>`,'full'); endc.id='end';
+
+const SCENES=[
+  [6,17.2,'Scene 1','<b>Thu 5 Nov</b> · Port Moresby → Guangzhou'],
+  [17.2,29.2,'Scene 2','<b>Fri 6 – Sat 7 Nov</b> · Pearl River Delta'],
+  [29.2,41.2,'Scene 3','<b>Sun 8 Nov</b> · Guangzhou → Tianjin → Cangzhou'],
+  [41.2,47.2,'Scene 4','<b>Mon 9 Nov</b> · Cangzhou, Hebei'],
+  [47.2,60.6,'Scene 5','<b>Tue 10 – Thu 12 Nov</b> · Boxing County, Shandong'],
+  [60.6,75.6,'Scene 6','<b>Fri 13 – Sat 14 Nov</b> · Return to Port Moresby'],
+];
+function dayAt(t){ // timeline progress 0..1 across 5..14 Nov
+  const map=[[6,0],[17.2,0],[23,1/9],[28.8,2/9],[31,3/9],[41.2,3/9],[44,4/9],[49,5/9],[60,7/9],[63,8/9],[72.4,1]];
+  if(t<=map[0][0]) return 0; for(let i=0;i<map.length-1;i++){ if(t<=map[i+1][0]) return lerp(map[i][1],map[i+1][1],(t-map[i][0])/(map[i+1][0]-map[i][0])); } return 1;
+}
+
+// ---------- projection helpers ----------
+const tmp=new THREE.Vector3();
+function proj(v){ tmp.copy(v).project(camera); const vis=v.clone().normalize().dot(camera.position.clone().sub(v))>-1e-4 && tmp.z<1;
+  return {x:(tmp.x+1)/2*W, y:(1-tmp.y)/2*H, vis}; }
+function place(d,x,y,o,s=1,rot=0){ d.style.opacity=o.toFixed(3); d.style.display=o<=0.001?'none':(d.classList.contains('full')?'flex':'block'); d.style.transform=`translate(${x}px,${y}px) rotate(${rot}deg) scale(${s})`; }
+function leader(ln,x1,y1,x2,y2,o){ const dx=x2-x1,dy=y2-y1; const L=Math.hypot(dx,dy); ln.style.opacity=o; ln.style.display=o<=.001?'none':'block';
+  ln.style.width=L+'px'; ln.style.transform=`translate(${x1}px,${y1}px) rotate(${Math.atan2(dy,dx)}rad)`; }
+
+// ---------- FX canvas ----------
+const fx=document.getElementById('fx'); fx.width=W*DPR; fx.height=H*DPR; const fc=fx.getContext('2d'); fc.scale(DPR,DPR);
+function hash(n){ const x=Math.sin(n*127.1)*43758.5453; return x-Math.floor(x); }
+function glowDot(x,y,r,a,col='255,220,150'){ const g=fc.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,`rgba(${col},${a})`); g.addColorStop(1,`rgba(${col},0)`); fc.fillStyle=g; fc.beginPath(); fc.arc(x,y,r,0,7); fc.fill(); }
+function ring(x,y,r,a,w=2){ fc.strokeStyle=`rgba(242,195,91,${a})`; fc.lineWidth=w; fc.beginPath(); fc.arc(x,y,r,0,7); fc.stroke(); }
+
+// ---------- frame ----------
+window.renderAt=function(t){
+  const c=placeCamera(t);
+  globeMat.uniforms.camPos.value.copy(camera.position); atm.material.uniforms.camPos.value.copy(camera.position);
+  globeMat.uniforms.detail.value=clamp((0.2-c.alt)/0.15);
+  const fin=prog(t,74.5,77.5);
+  globeMat.uniforms.glow.value=1+fin*.4;
+  // coast lines thinner when far
+  const near=c.alt<0.25; coastNear.visible=coastGlowN.visible=bordNear.visible=near; coastFar.visible=coastGlow.visible=bordFar.visible=!near;
+  provL.visible=provGlow.visible=c.alt<0.9; provL.material.opacity=.42*clamp((0.9-c.alt)/0.4)*(1-fin*.5);
+  coastFar.material.opacity=lerp(.4,.75,clamp((1.6-c.alt)/1.2)); bordFar.material.opacity=lerp(.15,.45,clamp((1.6-c.alt)/1.2)); coastGlow.material.opacity=lerp(.08,.2,clamp((1.6-c.alt)/1.2));
+
+  fc.clearRect(0,0,W,H);
+  // ambient particles
+  for(let i=0;i<70;i++){ const sp=.3+hash(i)*.7; const x=(hash(i+11)*W + t*12*sp)%W; const y=(hash(i+29)*H*1.2 - t*18*sp)%(H*1.2); const yy=y<0?y+H*1.2:y;
+    glowDot(x,yy-H*.1,3+hash(i+5)*6,.05+.08*Math.abs(Math.sin(t*.7+i)),'160,200,255'); }
+
+  // routes
+  const finalPulse= fin>0 ? .75+.25*Math.sin(t*3.2) : 1;
+  for(const o of routes){
+    const u=prog(t,o.t0,o.t1); const ue= o.type==='air'? smooth(u): ease(u);
+    if(o.core){ const n=Math.floor(ue*o.nseg); const shown=n>0;
+      for(const l of [o.glow,o.mid,o.core]){ l.visible=shown; l.geometry.instanceCount=n; }
+      o.glow.material.opacity=.3*finalPulse+fin*.15; o.mid.material.opacity=.75-fin*.25; o.core.material.opacity=1-fin*.35;
+    }
+    if(t>o.t0-.3 && t<o.t1+.5){
+      const p=at(o,ue); const S=proj(p); const S2=proj(at(o,clamp(ue+.004)));
+      const ang=Math.atan2(S2.x-S.x,-(S2.y-S.y))*180/Math.PI;
+      const o2=Math.min(clamp((t-o.t0+.3)/.3),clamp((o.t1+.5-t)/.35));
+      const v=vehEls[o.veh];
+      if(o.veh==='plane'){ const lift=Math.sin(Math.PI*ue); place(v,S.x,S.y,o2*(S.vis?1:0),.7+.45*lift,ang); }
+      else place(v,S.x,S.y-26,o2*(S.vis?1:0),1,0);
+      // sparkle trail
+      for(let k=1;k<16;k++){ const uu=ue-k*.006; if(uu<0) break; const q=proj(at(o,uu)); const j=hash(k*7.3+Math.floor(t*30));
+        glowDot(q.x+(j-.5)*10,q.y+(hash(k+3.1+Math.floor(t*30))-.5)*10,5+k*.6,(1-k/16)*.55*o2); }
+      glowDot(S.x,S.y,40,.35*o2);
+    }
+  }
+  for(const k in vehEls){ const active=routes.some(o=>o.veh===k&&t>o.t0-.3&&t<o.t1+.5); if(!active) place(vehEls[k],0,0,0); }
+
+  // items
+  for(const it of items){
+    if(it.kind==='city'){ const S=proj(vec(...it.ll,1.0002)); const o=S.vis?clamp((c.alt-it.a0)/(it.a0*.4))*clamp((it.a1-c.alt)/(it.a1*.3))*(1-fin)*.9*clamp((t-6)/1):0;
+      place(it.d,S.x+0,S.y-9,o); continue; }
+    const S=proj(vec(...it.ll,1.0003)); const vis=S.vis?1:0;
+    if(it.kind==='pin'){
+      const a=win(t,it.tIn,it.tOut,.5,.6)*vis; const pinA=(t>it.tIn? Math.max(a, .55*(1-fin)) : 0)*vis*(t>it.tIn?clamp((t-it.tIn)/.4):0);
+      const drop=easeOut(clamp((t-it.tIn)/.6)); place(it.p,S.x,S.y-(1-drop)*60,pinA, it.ll===P.POM&&t>70&&t<72?0:1);
+      if(a>0){ ring(S.x,S.y,10+((t*1.1)%1)*36,(1-(t*1.1)%1)*.7*a); }
+      const lx=S.x+it.dx, ly=S.y+it.dy; place(it.l,lx,ly-30,a,.96+.04*a);
+      leader(it.ln,S.x,S.y-40,it.dx<0?lx+it.l.firstChild.offsetWidth:lx,ly,a*.9);
+    } else if(it.kind==='icon'){
+      const k=clamp((t-it.tIn)/.55); const pop=k<=0?0:(1+Math.sin(k*Math.PI)*.35)*easeOut(k);
+      const resid=.3*clamp((0.3-c.alt)/0.15); const o=k>0?clamp(k*3)*vis*(it.tOut?clamp((it.tOut-t)/.8)*(1-resid)+resid:Math.max(clamp((61-t)/.8),resid))*(1-fin):0;
+      place(it.d,S.x,S.y-36,o,pop);
+      if(o>0){ glowDot(S.x,S.y-36,60,.25*o); if(it.pulse||k<1){ for(let r=0;r<(it.pulse?3:1);r++){ const ph=((t*.8)+r/3)%1; ring(S.x,S.y-36,30+ph*70,(1-ph)*.8*o,2.5);} } }
+    } else if(it.kind==='label'){
+      const a=win(t,it.tIn,it.tOut,.6,.6)*vis; const lx=S.x+it.dx, ly=S.y+it.dy;
+      place(it.l,lx,ly-30,a,.96+.04*a); leader(it.ln,S.x,S.y-36,it.dx<0?lx+it.l.firstChild.offsetWidth:lx,ly,a*.9);
+    }
+  }
+
+  // final badges
+  const fb=t>75?1:0;
+  BADGES.forEach(b=>{ const S=proj(vec(...b.ll,1.0003)); const a=clamp((t-75.6-b.i*.35)/.5)*(1-prog(t,86,87.2));
+    const x=S.x+b.off[0], y=S.y+b.off[1]; const k=easeOut(clamp((t-75.6-b.i*.35)/.5));
+    place(b.d,x,y,a,.6+.4*k); leader(b.ln,S.x,S.y,x,y,a*.85);
+    if(a>0){ glowDot(S.x,S.y,14,.9*a); glowDot(S.x,S.y,30,.4*a); } });
+  { const S=proj(vec(...P.POM,1.0003)); const a=clamp((t-75.4)/.5)*(1-prog(t,86,87.2)); place(homeBadge,S.x,S.y,a); }
+
+  // chrome
+  let sc=null; for(const s of SCENES) if(t>=s[0]&&t<s[1]) sc=s;
+  if(sc){ const a=win(t,sc[0],sc[1],.6,.5); chip.children[0].textContent=sc[2]; chip.children[1].innerHTML=sc[3]; place(chip,0,(1-easeOut(clamp((t-sc[0])/.7)))*14,a); chip.style.left='72px'; chip.style.top='64px'; }
+  else place(chip,0,0,0);
+  place(brand,0,0,win(t,6,87,1,.8)*.9); brand.style.left='auto'; brand.style.right='72px';
+  const tlA=win(t,6.5,87,1,.8)*(t<74.5?.55:1);
+  place(tl,0,(t<74.5?18:0)*(1-fin)+0,tlA, t<74.5?.92:1); tl.style.transformOrigin='50% 50%';
+  const dp=dayAt(t); tl.children[1].style.width=(dp*1600)+'px';
+  ticks.forEach((k,i)=>k.classList.toggle('on', i/9<=dp+1e-6 && t>6.5));
+  ticks.forEach(k=>{ const em=k.querySelector('em'); if(em) em.style.opacity=fin; });
+  shade.style.opacity=.85;
+  place(title,0,0,win(t,.4,6.2,1.2,.9)); title.firstChild.style.letterSpacing=(0.42+0.1*prog(t,0,6))+'em';
+  place(endc,0,0,win(t,87.4,200,1.2,.1)); endc.style.transform=`scale(${1+.03*prog(t,87.4,96)})`;
+  place(black,0,0, Math.max(1-clamp(t/1.2), clamp((t-86.6)/1.0)*.82));
+
+  renderer.render(scene,camera);
+};
+window.DURATION=96; window.__s={scene,globe,atm,renderer,camera,texMask,maskC};
+window.ready=true;
+if(!location.search.includes('capture')){ const t0=performance.now(); const loop=()=>{ const t=((performance.now()-t0)/1000)%window.DURATION; renderAt(t); requestAnimationFrame(loop); }; loop(); }
+</script>
+</body>
+</html>
